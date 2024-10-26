@@ -8,16 +8,44 @@ public class Register {
 	private int numFlags;
 	
 	private int data;
-	private Bus busExt, busInt;
+	private Bus busExt, busInt1, busInt2;
 	
 	/**
 	 * Default constructor
-	 * @param busExt
+	 * @param extBus 
+	 * @param intBus
 	 */
-	public Register(String name, Bus extBus, Bus intBus) {
+	public Register(String name, Bus extBus, Bus intBus, int regId) {
 		this.registerName = name;
 		this.busExt = extBus;
-		this.busInt = intBus;
+		
+		if(regId == 1)
+			this.busInt1 = intBus;
+		else 
+			this.busInt2 = intBus;
+	}
+	
+	/**
+	 * Construct for a register with one bus connection 
+	 * @param bus
+	 * @param busId Number that identifies if its external bus (0), intBus1 (1), intBus2 (2)
+	 */
+	public Register(String name, Bus bus, int busId) {
+		this.registerName = name;
+		if(busId == 0)
+			this.busExt= bus;
+		else if(busId == 1)
+			this.busInt1 = bus;
+		else 
+			this.busInt2 = bus;
+	
+	}
+		
+	public Register(String name, Bus busExt, Bus intBus1, Bus intBus2) {
+		this.registerName = name;
+		this.busExt = busExt;
+		this.busInt1 = intBus1;
+		this.busInt2 = intBus2;
 	}
 	
 	public int getData() {
@@ -71,6 +99,7 @@ public class Register {
 		data = busExt.get();
 	}
 	
+	
 	/**
 	 * This method reads the data from this register and stores it into the bus
 	 */
@@ -79,17 +108,30 @@ public class Register {
 	}
 	
 	/**
-	 * This method copies the data from this register to the internalbus
+	 * This method copies the data from this register to the internalbus1
 	 */
-	public void internalRead() {
-		busInt.put(data);
+	public void internalRead1() {
+		busInt1.put(data);
+	}
+	/**
+	 * This method copies the data from this register to the internalbus2
+	 */
+	public void internalRead2() {
+		busInt2.put(data);
 	}
 	
 	/**
-	 * This method sopies the data from the internalbus to this register
+	 * This method copies the data from the internalbus1 to this register
 	 */
-	public void internalStore() {
-		data = busInt.get();
+	public void internalStore1() {
+		data = busInt1.get();
+	}
+	
+	/**
+	 * This method copies the data from the internalbus2 to this register
+	 */
+	public void internalStore2() {
+		data = busInt2.get();
 	}
 
 

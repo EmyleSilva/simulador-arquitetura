@@ -14,8 +14,8 @@ public class Ula {
 		this.extBus1 = extBus1;
 		this.extBus2 = extBus2;
 		intBus = new Bus();
-		reg1 = new Register("UlaReg0", extBus1, intBus);
-		reg2 = new Register("UlaReg1", extBus1, intBus);
+		reg1 = new Register("UlaReg0", extBus1, intBus, 1);
+		reg2 = new Register("UlaReg1", extBus1, intBus, 1);
 	}
 
 	/**
@@ -24,12 +24,12 @@ public class Ula {
 	public void add() {
 		int res=0;
 		intBus.put(0);
-		reg1.internalRead(); //puts its data into the internal bus
+		reg1.internalRead1(); //puts its data into the internal bus
 		res = intBus.get(); //stored for operation
-		reg2.internalRead(); //puts the internal data into the internal bus
+		reg2.internalRead1(); //puts the internal data into the internal bus
 		res += intBus.get(); //the operation was performed
 		intBus.put(res);
-		reg2.internalStore(); //saves the result into internal store
+		reg2.internalStore1(); //saves the result into internal store
 	}
 	
 	/**
@@ -40,12 +40,12 @@ public class Ula {
 				
 		int res=0;
 		intBus.put(0);
-		reg1.internalRead(); //puts its data into the internal bus
+		reg1.internalRead1(); //puts its data into the internal bus
 		res = intBus.get(); //stored for operation
-		reg2.internalRead(); //puts the internal data into the internal bus
+		reg2.internalRead1(); //puts the internal data into the internal bus
 		res -= intBus.get(); //the operation was performed
 		intBus.put(res);
-		reg2.internalStore(); //saves the result into internal store
+		reg2.internalStore1(); //saves the result into internal store
 		
 	}
 	
@@ -54,11 +54,11 @@ public class Ula {
 	 */
 	public void inc() {
 		
-		reg2.internalRead();
+		reg2.internalRead1();
 		int res = intBus.get();
 		res ++;
 		intBus.put(res);
-		reg2.internalStore();
+		reg2.internalStore1();
 		
 	}
 	
