@@ -56,8 +56,8 @@ public class Architecture {
 		IR = new Register("IR", extbus1, intbus2);
 		RPG0 = new Register("RPG0", null, intbus1);
 		RPG1 = new Register ("RPG1", null, intbus1);
-		RPG0 = new Register("RPG0", null, intbus1);
-		RPG1 = new Register ("RPG1", null, intbus1);
+		RPG2 = new Register("RPG2", null, intbus1);
+		RPG3 = new Register ("RPG3", null, intbus1);
 		stkTop = new Register("stkTop", extbus1, null);
 		stkBot = new Register("stkBot", extbus1, null);
 		Flags = new Register(2, intbus2);
@@ -206,6 +206,7 @@ public class Architecture {
 		commandsList.add("moveRegReg"); //9
 		commandsList.add("addMemReg"); //10
 		commandsList.add("subRegMem"); //11
+		commandsList.add("moveImmReg");//12
 	}
 
 	
@@ -804,6 +805,33 @@ public class Architecture {
 		PC.internalStore();
 	}
 	
+	public void moveImmReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read(); 
+		memory.read(); 
+		IR.store(); 
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.read(1);
+		registersInternalStore();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
