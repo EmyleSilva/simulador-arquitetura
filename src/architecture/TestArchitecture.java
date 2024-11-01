@@ -549,6 +549,256 @@ public class TestArchitecture {
 		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
 	}
 	
+
+	@Test
+	public void testAddMemReg() {
+	    Architecture arch = new Architecture();
+	    
+	    //Stores the number 35 into the memory in the position 31
+	    arch.getMemory().getDataList()[31] = 35; 
+	    //Stores the number 0 into the memory in the position 32
+	    arch.getMemory().getDataList()[32] = 0;
+	    //Stores the number 3 into the memory in the position 35
+	    arch.getMemory().getDataList()[35] = 3;
+	    
+	    //set the pc Value to 30
+	    arch.getExtbus1().put(30);
+	    arch.getPC().store();
+	    
+	    //Clears the extBus
+	    arch.getExtbus1().put(0);
+	    
+	    //Setting the register 0 with the value 5
+	    arch.getIntbus1().put(5);
+	    arch.getRegistersList().get(0).internalStore();
+	    
+	    //Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Now the addMemReg command can be executed 
+	    //In the end of the execution the value in Reg0 must be 8
+	    arch.addMemReg();
+	    arch.getRPG0().internalRead();
+	    assertEquals(8, arch.getIntbus1().get());
+	    
+	    //PC must be pointing to 33
+	    arch.getPC().read();
+	    assertEquals(33, arch.getExtbus1().get());
+	    
+	    //The value of the memory in position 31 must be 35
+	    arch.getExtbus1().put(31);
+	    arch.getMemory().read();
+	    assertEquals(35, arch.getExtbus1().get());
+	    //The value of the memory in position 32 must be 0
+	    arch.getExtbus1().put(32);
+	    arch.getMemory().read();
+	    assertEquals(0, arch.getExtbus1().get());
+	    //The value of the memory in position 35 must be 3
+	    arch.getExtbus1().put(35);
+	    arch.getMemory().read();
+	    assertEquals(3, arch.getExtbus1().get());
+	}
+	
+	@Test
+	public void testSubRegMem() {
+	    Architecture arch = new Architecture();
+	    
+	    //Stores the number 1 in the position 21 of the memory
+	    arch.getMemory().getDataList()[21] = 1;
+	    //Stores the number 26 in the position 22 of the memory
+	    arch.getMemory().getDataList()[22] = 26;
+	    //Stores the number 30 in the position 26 of the memory
+	    arch.getMemory().getDataList()[26] = 30;
+	    
+	    //Stores the value 25 into the Register 1
+	    arch.getIntbus1().put(25);
+	    arch.getRPG1().internalStore();
+	    
+	    //Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Set PC's value as 20
+	    arch.getExtbus1().put(20);
+	    arch.getPC().store();
+	    
+	    //Clears the external bus
+	    arch.getExtbus1().put(0);
+	    
+	    //Now the subRegMem command can be executed
+	    arch.subRegMem();
+	    
+	    //In the end of the execution, the position 26 of the memory must store -5
+	    arch.getExtbus1().put(26);
+	    arch.getMemory().read();
+	    assertEquals(-5, arch.getExtbus1().get());
+	    
+	    //The value stored into the position 21 of the memory must be 1
+	    arch.getExtbus1().put(21);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+	    
+	    //The value stored into the position 22 of the memory must be 26
+	    arch.getExtbus1().put(22);
+	    arch.getMemory().read();
+	    assertEquals(26, arch.getExtbus1().get());
+	    
+	    //The value stored into the Register 1 must be 25
+	    arch.getRPG1().internalRead();
+	    assertEquals(25, arch.getIntbus1().get());
+	    
+	    //PC must be pointing to the position 23
+	    arch.getPC().read();
+	    assertEquals(23, arch.getExtbus1().get());
+	    
+	    //The flag bit zero must be 0, and bit negative must be 1
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(1, arch.getFlags().getBit(1));
+	}
+	
+	@Test
+	public void testMoveImmReg() {
+	    Architecture arch = new Architecture();
+	    
+	    //Stores the value 105 in the position 16 of the memory
+	    arch.getMemory().getDataList()[16] = 105;
+	    //Stores the value 2 in the position 17 of the memory
+	    arch.getMemory().getDataList()[17] = 2;
+	    
+	    //Sets PC's value to the position 15 of the memory
+	    arch.getExtbus1().put(15);
+	    arch.getPC().store();
+	    
+	    //Clears external bus
+	    arch.getExtbus1().put(0);
+	    
+	    //Set Reg2 value as 15
+	    arch.getIntbus1().put(15);
+	    arch.getRPG2().internalStore();
+	    
+	    //Clears internal bus 1
+	    arch.getIntbus1().put(0);
+	    //Verifies if RPG2 stores the correct value
+	    arch.getRPG2().internalRead();
+	    assertEquals(15, arch.getIntbus1().get());
+	    //Clears internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Now the command can be executed
+	    arch.moveImmReg();
+	    
+	    //The position 16 of the memory must store 105
+	    arch.getExtbus1().put(16);
+	    arch.getMemory().read();
+	    assertEquals(105, arch.getExtbus1().get());
+	    //The position 17 of the memory must store 2
+	    arch.getExtbus1().put(17);
+	    arch.getMemory().read();		
+	    assertEquals(2, arch.getExtbus1().get());
+	    
+	    //The value stored into RPG2 must be 105
+	    arch.getRPG2().internalRead();
+	    assertEquals(105, arch.getIntbus1().get());
+	    
+	    //The value stored into PC must be 18
+	    arch.getPC().read();
+	    assertEquals(18, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testJeq() {
+	    Architecture arch = new Architecture();
+	    
+	    //Stores the value 35 into the registers 0 and 1
+	    arch.getIntbus1().put(35);
+	    arch.getRPG0().internalStore();
+	    arch.getRPG1().internalStore();
+	    
+	    //Stores the value 13 into the register 2
+	    arch.getIntbus1().put(13);
+	    arch.getRPG2().internalStore();
+	    //Stores the value 14 into the register 3
+	    arch.getIntbus1().put(14);
+	    arch.getRPG3().internalStore();
+	    //Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Sets PC's value to 15
+	    arch.getExtbus1().put(15);
+	    arch.getPC().store();
+	    //Clears external bus
+	    arch.getExtbus1().put(0);
+	    
+	    //Stores the values into the memory
+	    arch.getMemory().getDataList()[16] = 0;
+	    arch.getMemory().getDataList()[17] = 1;
+	    arch.getMemory().getDataList()[18] = 24;
+	    arch.getMemory().getDataList()[25] = 2;
+	    arch.getMemory().getDataList()[26] = 3;
+	    arch.getMemory().getDataList()[27] = 15;
+	    
+	    //Now the command can be executed for the FIRST TEST
+	    //In this case, the result must be true and PC must point in the end to 24
+	    arch.jeq();
+	    
+	    arch.getPC().read();
+	    assertEquals(24, arch.getExtbus1().get());
+	    
+	    //The values of registers must continue the same as in the beginning of the operation
+	    arch.getRPG0().internalRead();
+	    assertEquals(35, arch.getIntbus1().get());
+	    arch.getRPG1().internalRead();
+	    assertEquals(35, arch.getIntbus1().get());
+	    arch.getRPG2().internalRead();
+	    assertEquals(13, arch.getIntbus1().get());
+	    arch.getRPG3().internalRead();
+	    assertEquals(14, arch.getIntbus1().get());
+	    
+	    //Also, the values stored in the memory must have remained the same
+	    arch.getExtbus1().put(16);
+	    arch.getMemory().read();
+	    assertEquals(0, arch.getExtbus1().get());
+	    arch.getExtbus1().put(17);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+	    arch.getExtbus1().put(18);
+	    arch.getMemory().read();
+	    assertEquals(24, arch.getExtbus1().get());
+	    
+	    //The bit zero of flags must be 1
+	    assertEquals(1, arch.getFlags().getBit(0));
+	    
+	    //Now the SECOND TEST can be executed, in this case PC starts in 25
+	    arch.jeq();
+	    
+	    //PC must Store 28
+	    arch.getPC().read();
+	    assertEquals(28, arch.getExtbus1().get());
+	    
+	    //The values of registers must continue the same as in the beginning of the operation
+	    arch.getRPG0().internalRead();
+	    assertEquals(35, arch.getIntbus1().get());
+	    arch.getRPG1().internalRead();
+	    assertEquals(35, arch.getIntbus1().get());
+	    arch.getRPG2().internalRead();
+	    assertEquals(13, arch.getIntbus1().get());
+	    arch.getRPG3().internalRead();
+	    assertEquals(14, arch.getIntbus1().get());
+	    
+	    //Also, the values stored in the memory must have remained the same
+	    arch.getExtbus1().put(25);
+	    arch.getMemory().read();
+	    assertEquals(2, arch.getExtbus1().get());
+	    arch.getExtbus1().put(26);
+	    arch.getMemory().read();
+	    assertEquals(3, arch.getExtbus1().get());
+	    arch.getExtbus1().put(27);
+	    arch.getMemory().read();
+	    assertEquals(15, arch.getExtbus1().get());
+	    
+	    //The bit zero of flags must be 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	}
+	
 	@Test
 	public void testFillCommandsList() {
 		
@@ -565,6 +815,10 @@ public class TestArchitecture {
 				ldi x    (rpg <- x. x must be an integer)
 				inc    (rpg++)
 				move %reg0 %reg1 (reg1 <- Reg0)
+				add mem %regA (regA <- memory[mem] + RegA)
+				sub %regA mem (memory[mem] <- regA - memory[mem])
+				move imm %regA (regA <- immediate)
+				jeq %regA %regB mem (if regA == regB, PC <- mem)
 		 */
 
 		
@@ -581,6 +835,10 @@ public class TestArchitecture {
 		assertTrue("ldi".equals(commands.get(7)));
 		assertTrue("inc".equals(commands.get(8)));
 		assertTrue("moveRegReg".equals(commands.get(9)));
+		assertTrue("addMemReg".equals(commands.get(10)));
+		assertTrue("subRegMem".equals(commands.get(11)));
+		assertTrue("moveImmReg".equals(commands.get(12)));
+		assertTrue("jeq".equals(commands.get(13)));
 	}
 	
 	@Test
