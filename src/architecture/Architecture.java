@@ -271,11 +271,9 @@ public class Architecture {
 		memory.read(); // the parameter is now in the external bus. 
 						//but the parameter is an address and we need the value
 		memory.read(); //now the value is in the external bus
-//		RPG0.internalStore();
-//		RPG0.internalRead();
-//		IR.store();
-//		IR.internalRead();
-		ula.store(1); //the rpg value is in ULA (0). This is the second parameter 
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter 
 		ula.add(); //the result is in the second ula's internal register
 		ula.internalRead(1);; //the operation result is in the internalbus 2
 		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
@@ -336,9 +334,9 @@ public class Architecture {
 		memory.read(); // the parameter is now in the external bus. 
 						//but the parameter is an address and we need the value
 		memory.read(); //now the value is in the external bus
-		RPG0.store();
-		RPG0.internalRead();
-		ula.store(1); //the rpg value is in ULA (0). This is the second parameter
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter
 		ula.sub(); //the result is in the second ula's internal register
 		ula.internalRead(1);; //the operation result is in the internalbus 2
 		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
@@ -515,7 +513,14 @@ public class Architecture {
 		PC.read(); 
 		memory.read(); // the address is now in the external bus.
 		memory.read(); // the data is now in the external bus.
-		RPG0.store();
+//		RPG0.store();
+		/** @TODO Os passos a seguir não sei se estão corretos, mas não encontrei outra forma de implementar*/
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.read(1);
+		RPG0.internalStore();
+		
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -561,7 +566,14 @@ public class Architecture {
 		memory.read();   //the parameter address (pointing to the addres where data must be stored
 		                 //is now in externalbus1
 		memory.store(); //the address is in the memory. Now we must to send the data
-		RPG0.read();
+		
+		/** @TODO mesma coisa do read...*/
+		RPG0.internalRead();
+		ula.store(1);
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+		
 		memory.store(); //the data is now stored
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
@@ -603,7 +615,14 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read(); 
 		memory.read(); // the immediate is now in the external bus.
-		RPG0.store();   //RPG receives the immediate
+		
+		/**@TODO: mesma coisa dos anteriores*/
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.read(1);
+		
+		RPG0.internalStore();   //RPG receives the immediate
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
