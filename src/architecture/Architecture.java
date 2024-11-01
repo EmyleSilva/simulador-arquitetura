@@ -207,6 +207,7 @@ public class Architecture {
 		commandsList.add("addMemReg"); //10
 		commandsList.add("subRegMem"); //11
 		commandsList.add("moveImmReg");//12
+		commandsList.add("jeq");   //13
 	}
 
 	
@@ -831,6 +832,48 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore();
+	}
+	
+	public void jeq() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    statusMemory.storeIn1();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    statusMemory.storeIn0();
+	    
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    extbus1.put(Flags.getBit(0));
+	    statusMemory.read();
+	    PC.store();
 	}
 	
 	public ArrayList<Register> getRegistersList() {
