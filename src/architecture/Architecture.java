@@ -204,6 +204,7 @@ public class Architecture {
 		commandsList.add("ldi");   //7
 		commandsList.add("inc");   //8		
 		commandsList.add("moveRegReg"); //9
+		commandsList.add("addMemReg"); //10
 	}
 
 	
@@ -731,6 +732,39 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
 	
+	public void addMemReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read();
+		memory.read();
+		memory.read();
+		IR.store(); //Valor da memoria agora esta em IR
+		ula.inc();
+		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no bus2
+		PC.internalStore();
+		PC.read();
+		memory.read(); //Devolve o ID do RPG
+		demux.setValue(extbus1.get());
+		registersInternalRead(); //O registrador coloca o dado no intbus1
+		ula.store(1);
+		IR.internalRead();
+		ula.internalStore(0);
+		ula.add();
+		ula.read(1);
+		registersInternalStore();
+		
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();		
+	}
+	
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
@@ -749,7 +783,7 @@ public class Architecture {
 	 * The register id must be in the demux bus
 	 */
 	private void registersInternalRead() {
-		registersList.get(demux.getValue()).internalRead();;
+		registersList.get(demux.getValue()).internalRead();
 	}
 	
 	/**
@@ -765,7 +799,7 @@ public class Architecture {
 	 * The register id must be in the demux bus
 	 */
 	private void registersInternalStore() {
-		registersList.get(demux.getValue()).internalStore();;
+		registersList.get(demux.getValue()).internalStore();
 	}
 
 
