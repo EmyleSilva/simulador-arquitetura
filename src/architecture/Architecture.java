@@ -28,8 +28,12 @@ public class Architecture {
 	private int memorySize;
 	private Register PC;
 	private Register IR;
-	private Register RPG;
+	private Register RPG0;
 	private Register RPG1;
+	private Register RPG2;
+	private Register RPG3;
+	private Register stkTop;
+	private Register stkBot;
 	private Register Flags;
 	private Ula ula;
 	private Demux demux; //only for multiple register purposes
@@ -50,8 +54,12 @@ public class Architecture {
 		intbus2 = new Bus();
 		PC = new Register("PC", extbus1, intbus2);
 		IR = new Register("IR", extbus1, intbus2);
-		RPG = new Register("RPG0", extbus1, intbus1);
-		RPG1 = new Register ("RPG1", extbus1, intbus1);
+		RPG0 = new Register("RPG0", null, intbus1);
+		RPG1 = new Register ("RPG1", null, intbus1);
+		RPG0 = new Register("RPG0", null, intbus1);
+		RPG1 = new Register ("RPG1", null, intbus1);
+		stkTop = new Register("stkTop", extbus1, null);
+		stkBot = new Register("stkBot", extbus1, null);
 		Flags = new Register(2, intbus2);
 		fillRegistersList();
 		ula = new Ula(intbus1, intbus2);
@@ -70,8 +78,12 @@ public class Architecture {
 	 */
 	private void fillRegistersList() {
 		registersList = new ArrayList<Register>();
-		registersList.add(RPG);
+		registersList.add(RPG0);
 		registersList.add(RPG1);
+		registersList.add(RPG2);
+		registersList.add(RPG3);
+		registersList.add(stkTop);
+		registersList.add(stkBot);
 		registersList.add(PC);
 		registersList.add(IR);
 		registersList.add(Flags);
@@ -123,8 +135,28 @@ public class Architecture {
 		return IR;
 	}
 
-	protected Register getRPG() {
-		return RPG;
+	protected Register getRPG0() {
+		return RPG0;
+	}
+	
+	protected Register getRPG1() {
+		return RPG1;
+	}
+	
+	protected Register getRPG2() {
+		return RPG2;
+	}
+	
+	protected Register getRPG3() {
+		return RPG3;
+	}
+	
+	protected Register getStkTop() {
+		return stkTop;
+	}
+	
+	protected Register getStkBot() {
+		return stkBot;
 	}
 
 	protected Register getFlags() {
@@ -233,19 +265,19 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the parameter address
-		RPG.internalRead();
+		RPG0.internalRead();
 		ula.store(0); //the rpg value is in ULA (0). This is the first parameter
 		PC.read(); 
 		memory.read(); // the parameter is now in the external bus. 
 						//but the parameter is an address and we need the value
 		memory.read(); //now the value is in the external bus
-		RPG.store();
-		RPG.internalRead();
-		ula.store(1); //the rpg value is in ULA (0). This is the second parameter 
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter 
 		ula.add(); //the result is in the second ula's internal register
 		ula.internalRead(1);; //the operation result is in the internalbus 2
 		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
-		RPG.internalStore(); //now the add is complete
+		RPG0.internalStore(); //now the add is complete
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -296,19 +328,19 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the parameter address
-		RPG.internalRead();
+		RPG0.internalRead();
 		ula.store(0); //the rpg value is in ULA (0). This is the first parameter
 		PC.read(); 
 		memory.read(); // the parameter is now in the external bus. 
 						//but the parameter is an address and we need the value
 		memory.read(); //now the value is in the external bus
-		RPG.store();
-		RPG.internalRead();
-		ula.store(1); //the rpg value is in ULA (0). This is the second parameter
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter
 		ula.sub(); //the result is in the second ula's internal register
 		ula.internalRead(1);; //the operation result is in the internalbus 2
 		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
-		RPG.internalStore(); //now the sub is complete
+		RPG0.internalStore(); //now the sub is complete
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -481,7 +513,14 @@ public class Architecture {
 		PC.read(); 
 		memory.read(); // the address is now in the external bus.
 		memory.read(); // the data is now in the external bus.
-		RPG.store();
+//		RPG0.store();
+		/** @TODO Os passos a seguir não sei se estão corretos, mas não encontrei outra forma de implementar*/
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.read(1);
+		RPG0.internalStore();
+		
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -527,7 +566,14 @@ public class Architecture {
 		memory.read();   //the parameter address (pointing to the addres where data must be stored
 		                 //is now in externalbus1
 		memory.store(); //the address is in the memory. Now we must to send the data
-		RPG.read();
+		
+		/** @TODO mesma coisa do read...*/
+		RPG0.internalRead();
+		ula.store(1);
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+		
 		memory.store(); //the data is now stored
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
@@ -569,7 +615,14 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read(); 
 		memory.read(); // the immediate is now in the external bus.
-		RPG.store();   //RPG receives the immediate
+		
+		/**@TODO: mesma coisa dos anteriores*/
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.read(1);
+		
+		RPG0.internalStore();   //RPG receives the immediate
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -606,12 +659,12 @@ public class Architecture {
 	 * @param address
 	 */
 	public void inc() {
-		RPG.internalRead();
+		RPG0.internalRead();
 		ula.store(1);
 		ula.inc();
 		ula.read(1);
 		setStatusFlags(intbus1.get());
-		RPG.internalStore();
+		RPG0.internalStore();
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
