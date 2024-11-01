@@ -205,6 +205,7 @@ public class Architecture {
 		commandsList.add("inc");   //8		
 		commandsList.add("moveRegReg"); //9
 		commandsList.add("addMemReg"); //10
+		commandsList.add("subRegMem"); //11
 	}
 
 	
@@ -763,6 +764,44 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore();		
+	}
+	
+	public void subRegMem() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		registersInternalRead(); 
+		ula.store(0);
+		PC.read(); 
+		memory.read();
+		memory.read(); 
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		IR.internalStore();
+		PC.read();
+		memory.read();
+		memory.store();
+		IR.read();
+		memory.store();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
 	}
 	
 	
