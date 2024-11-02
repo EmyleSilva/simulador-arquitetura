@@ -54,10 +54,10 @@ public class Architecture {
 		intbus2 = new Bus();
 		PC = new Register("PC", extbus1, intbus2);
 		IR = new Register("IR", extbus1, intbus2);
-		RPG0 = new Register("RPG0", null, intbus1);
-		RPG1 = new Register ("RPG1", null, intbus1);
-		RPG2 = new Register("RPG2", null, intbus1);
-		RPG3 = new Register ("RPG3", null, intbus1);
+		RPG0 = new Register("RPG0", intbus2, intbus1);
+		RPG1 = new Register ("RPG1", intbus2, intbus1);
+		RPG2 = new Register("RPG2", intbus2, intbus1);
+		RPG3 = new Register ("RPG3", intbus2, intbus1);
 		stkTop = new Register("stkTop", extbus1, null);
 		stkBot = new Register("stkBot", extbus1, null);
 		Flags = new Register(2, intbus2);
@@ -517,13 +517,10 @@ public class Architecture {
 		PC.read(); 
 		memory.read(); // the address is now in the external bus.
 		memory.read(); // the data is now in the external bus.
-//		RPG0.store();
-		/** @TODO Os passos a seguir não sei se estão corretos, mas não encontrei outra forma de implementar*/
+
 		IR.store();
 		IR.internalRead();
-		ula.internalStore(1);
-		ula.read(1);
-		RPG0.internalStore();
+		RPG0.store();
 		
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
@@ -571,10 +568,7 @@ public class Architecture {
 		                 //is now in externalbus1
 		memory.store(); //the address is in the memory. Now we must to send the data
 		
-		/** @TODO mesma coisa do read...*/
-		RPG0.internalRead();
-		ula.store(1);
-		ula.internalRead(1);
+		RPG0.read();
 		IR.internalStore();
 		IR.read();
 		
@@ -620,13 +614,10 @@ public class Architecture {
 		PC.read(); 
 		memory.read(); // the immediate is now in the external bus.
 		
-		/**@TODO: mesma coisa dos anteriores*/
 		IR.store();
 		IR.internalRead();
-		ula.internalStore(1);
-		ula.read(1);
+		RPG0.store();   //RPG receives the immediate
 		
-		RPG0.internalStore();   //RPG receives the immediate
 		PC.internalRead(); //we need to make PC points to the next instruction address
 		ula.internalStore(1);
 		ula.inc();
@@ -823,9 +814,7 @@ public class Architecture {
 		memory.read();
 		demux.setValue(extbus1.get());
 		IR.internalRead();
-		ula.internalStore(1);
-		ula.read(1);
-		registersInternalStore();
+		registersStore();
 		
 		PC.internalRead();
 		ula.internalStore(1);
