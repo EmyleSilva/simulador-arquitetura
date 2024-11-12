@@ -208,6 +208,9 @@ public class Architecture {
 		commandsList.add("subRegMem"); //11
 		commandsList.add("moveImmReg");//12
 		commandsList.add("jeq");   //13
+		commandsList.add("jgt");   //14
+		commandsList.add("addImmReg");   //15
+		commandsList.add("moveMemReg");   //16
 	}
 
 	
@@ -342,7 +345,7 @@ public class Architecture {
 		IR.internalRead();
 		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter
 		ula.sub(); //the result is in the second ula's internal register
-		ula.internalRead(1);; //the operation result is in the internalbus 2
+		ula.internalRead(1); //the operation result is in the internalbus 2
 		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
 		RPG0.internalStore(); //now the sub is complete
 		PC.internalRead(); //we need to make PC points to the next instruction address
@@ -480,6 +483,54 @@ public class Architecture {
 		extbus1.put(Flags.getBit(1)); //the ZERO bit is in the external bus 
 		statusMemory.read(); //gets the correct address (next instruction or parameter address)
 		PC.store(); //stores into PC
+	}
+
+	public void jgt(){
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+
+		//REG A
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		
+		//REG B
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		IR.store();
+		
+		//JUMP 1
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		statusMemory.storeIn1();
+		
+		//JUMP 0
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		statusMemory.storeIn0();
+		IR.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(1);
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		extbus1.put(Flags.getBit(1));
+		statusMemory.read();
+		PC.store();
 	}
 	
 	/**
@@ -725,6 +776,31 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
+
+	public void moveMemReg() {
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //now PC points to the first parameter
+		PC.read(); 
+		memory.read(); // the address memory is now in the external bus.
+		memory.read(); // the data memory is now in the external bus.
+		IR.store();
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //now PC points to the second parameter (the second reg id)
+		PC.read();
+		memory.read(); // the register id is now in the external bus.
+		demux.setValue(extbus1.get()); //points to the correct register
+		IR.internalRead();
+		registersStore(); //performs an internal store for the register identified into demux bus
+		PC.internalRead(); //we need to make PC points to the next instruction address
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
+	}
 	
 	public void addMemReg() {
         PC.internalRead();
@@ -758,6 +834,37 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();		
 	}
+
+	public void addImmReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		PC.read();
+		memory.read(); //Devolve o valor imediato
+		IR.store(); //armazena o valor imediato no IR
+		ula.inc();
+		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no intbus2
+		PC.internalStore();
+		PC.read();
+		memory.read(); //Devolve o ID do RPG
+		demux.setValue(extbus1.get());
+		registersInternalRead(); //O registrador coloca o dado no intbus1
+		ula.store(1);
+		IR.internalRead();
+		ula.internalStore(0);
+		ula.add();
+		ula.read(1);
+		registersInternalStore();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();		
+	}	
 	
 	public void subRegMem() {
         PC.internalRead();

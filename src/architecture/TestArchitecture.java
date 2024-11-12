@@ -366,6 +366,36 @@ public class TestArchitecture {
 		arch.getPC().internalRead();
 		assertEquals(32, arch.getIntbus2().get());
 	}
+
+	@Test
+	public void jgt(){
+		Architecture arch = new Architecture();
+
+		//storing the number 1 in the memory, in position 31
+		arch.getMemory().getDataList()[46]=1;
+		//storing the number 0 in the memory, in position 32
+		arch.getMemory().getDataList()[47]=0;
+		//making PC points to position 30
+		arch.getMemory().getDataList()[48]=30;
+		arch.getExtbus1().put(45);
+		arch.getPC().store();
+		
+		//now setting the registers values
+		arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).internalStore(); //RPG0 has 45
+		arch.getIntbus1().put(7);
+		arch.getRegistersList().get(1).internalStore(); //RPG1 has 99
+
+		arch.jgt();
+		
+		arch.getRegistersList().get(0).internalRead();
+		assertEquals(45, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).internalRead();
+		assertEquals(7, arch.getIntbus1().get());
+
+		arch.getPC().read();
+		assertEquals(30, arch.getExtbus1().get());
+	}
 	
 	@Test
 	public void testRead() {
@@ -548,7 +578,40 @@ public class TestArchitecture {
 		//PC was pointing to 30; now it must be pointing to 33
 		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
 	}
-	
+
+	@Test
+	public void testMoveMemReg() {
+		Architecture arch = new Architecture();
+
+		//storing the number 1 in the memory, in position 31
+		arch.getMemory().getDataList()[61]=80;
+		//storing the number 0 in the memory, in position 32
+		arch.getMemory().getDataList()[62]=2;
+		//making PC points to position 30
+		arch.getExtbus1().put(60);
+		arch.getPC().store();
+		
+		
+		//now setting the registers values
+		arch.getMemory().getDataList()[80]=25;
+		arch.getIntbus1().put(40);
+		arch.getRegistersList().get(2).internalStore(); //RPG1 has 99
+		
+		//executing the command move REG1 REG0.
+		arch.moveMemReg();
+		
+		//testing if both REG1 and REG0 store the same value: 99
+		arch.getExtbus1().put(61);
+		arch.getMemory().read();
+		arch.getMemory().read();
+		assertEquals(25, arch.getExtbus1().get());
+		arch.getRegistersList().get(2).internalRead();
+		assertEquals(25, arch.getIntbus1().get());
+		
+		//Testing if PC points to 3 positions after the original
+		//PC was pointing to 30; now it must be pointing to 33
+		arch.getPC().read();assertEquals(63, arch.getExtbus1().get());
+	}
 
 	@Test
 	public void testAddMemReg() {
@@ -598,7 +661,44 @@ public class TestArchitecture {
 	    arch.getMemory().read();
 	    assertEquals(3, arch.getExtbus1().get());
 	}
-	
+
+	@Test
+	public void testaddImmReg() {
+	    Architecture arch = new Architecture();
+		//Stores the number 100 into the memory in the position 70
+	    arch.getMemory().getDataList()[70] = 100; 
+
+		//Stores the number register into the memory in the position 71
+	    arch.getMemory().getDataList()[71] = 1;
+	    
+	    //set the pc Value to 69
+	    arch.getExtbus1().put(69);
+	    arch.getPC().store();
+	    
+	    arch.getExtbus1().put(0);
+
+	    arch.getIntbus1().put(5);
+	    arch.getRegistersList().get(1).internalStore();
+	    
+	    //Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Now the addMemReg command can be executed 
+	    //In the end of the execution the value in Reg0 must be 8
+	    arch.addImmReg();
+	    arch.getRPG1().internalRead();
+	    assertEquals(105, arch.getIntbus1().get());
+	    
+	    //PC must be pointing to 33
+	    arch.getPC().read();
+	    assertEquals(72, arch.getExtbus1().get());
+	    
+	    //The value of the memory in position 31 must be 35
+	    arch.getExtbus1().put(70);
+	    arch.getMemory().read();
+	    assertEquals(100, arch.getExtbus1().get());
+	}
+
 	@Test
 	public void testSubRegMem() {
 	    Architecture arch = new Architecture();
@@ -839,6 +939,9 @@ public class TestArchitecture {
 		assertTrue("subRegMem".equals(commands.get(11)));
 		assertTrue("moveImmReg".equals(commands.get(12)));
 		assertTrue("jeq".equals(commands.get(13)));
+		assertTrue("jgt".equals(commands.get(14)));
+		assertTrue("addImmReg".equals(commands.get(15)));
+		assertTrue("moveMemReg".equals(commands.get(16)));
 	}
 	
 	@Test
