@@ -211,6 +211,7 @@ public class Architecture {
 		commandsList.add("jgt");   //14
 		commandsList.add("addImmReg");   //15
 		commandsList.add("moveMemReg");   //16
+		commandsList.add("subRegReg");   //17
 	}
 
 	
@@ -972,6 +973,90 @@ public class Architecture {
 	    PC.store();
 	}
 	
+	public void subRegReg() {
+		
+		// PC++
+		PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+		// armazena RegA em IR
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersRead();
+		IR.internalStore();
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// armazena RegB em ULA(0)
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		
+		// recupera RegA de IR e armazena em ULA(1)
+		IR.internalRead();
+		ula.internalStore(1);
+
+		// realiza a operação de subtração e armazena em RegB
+		ula.sub();
+		ula.read(1);
+		setStatusFlags(intbus2.get());
+		//demux.setValue(extbus1.get());
+		registersInternalStore();
+
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+	}
+	/*
+	public void moveRegMem() {
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// acessa RegA e posiciona em ula(0)
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		ula.read(0);
+
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// acessa memoria[mem] no modo store e armazena RegA nessa posição de memória
+		PC.read();
+		memory.read();
+		memory.store();
+		IR.read();
+		memory.store();
+
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}*/
+	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
 	}
@@ -1086,6 +1171,8 @@ public class Architecture {
 		case 9:
 			moveRegReg();
 			break;
+		case 10:
+			subRegReg();
 		default:
 			halt = true;
 			break;
