@@ -900,6 +900,163 @@ public class TestArchitecture {
 	}
 	
 	@Test
+	public void testSubRegReg() {
+		Architecture arch = new Architecture();
+		
+		// Stores the number 0 in the position 10 of the memory
+		arch.getMemory().getDataList()[10] = 0;
+		// Stores the number 1 in the position 11 of the memory
+		arch.getMemory().getDataList()[11] = 1;
+		
+		// Stores the value 20 into the Register 0
+		arch.getIntbus1().put(20);
+		arch.getRPG0().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+		
+		// Stores the value 5 into the Register 1
+		arch.getIntbus1().put(5);
+		arch.getRPG1().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+		// Making PC points to position 9
+		arch.getExtbus1().put(9);
+		arch.getPC().store();
+		
+		// Executing the command sub Reg0 Reg1.
+		arch.subRegReg();
+		
+		// Clears the external bus
+	    arch.getExtbus1().put(0);
+		
+		// The value stored into the position 10 of the memory must be 0
+	    arch.getExtbus1().put(10);
+	    arch.getMemory().read();
+	    assertEquals(0, arch.getExtbus1().get());
+		
+	    // The value stored into the position 11 of the memory must be 1
+	    arch.getExtbus1().put(11);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+		
+		// The value stored into the Register 0 must be 20
+		arch.getRegistersList().get(0).internalRead();
+		assertEquals(20, arch.getIntbus1().get());
+		
+		// The value stored into the Register 1 must be 15
+	    arch.getRegistersList().get(1).internalRead();
+	    assertEquals(15, arch.getIntbus1().get());
+		
+		// Testing if PC points to 3 positions after the original
+		// PC was pointing to 9; now it must be pointing to 12
+		arch.getPC().read();assertEquals(12, arch.getExtbus1().get());
+		
+		// The flag bit zero must be 0, and bit negative must be 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
+	}
+	
+	@Test
+	public void testMoveRegMem() {
+		Architecture arch = new Architecture();
+		
+		//Stores the number 1 in the position 21 of the memory
+	    arch.getMemory().getDataList()[21] = 1;
+	    //Stores the number 26 in the position 22 of the memory
+	    arch.getMemory().getDataList()[22] = 26;
+	    //Stores the number 30 in the position 26 of the memory
+	    arch.getMemory().getDataList()[26] = 30;
+	    
+	    //Stores the value 25 into the Register 1
+	    arch.getIntbus1().put(25);
+	    arch.getRPG1().internalStore();
+		
+	    //Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+	    //Set PC's value as 20
+	    arch.getExtbus1().put(20);
+	    arch.getPC().store();
+	    
+	    // Clears the external bus
+	    arch.getExtbus1().put(0);
+	    
+	    // Now the moveRegMem command can be executed
+	    arch.moveRegMem();
+	    
+	    //The value stored into the position 21 of the memory must be 1
+	    arch.getExtbus1().put(21);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+	    
+	    //The value stored into the position 22 of the memory must be 26
+	    arch.getExtbus1().put(22);
+	    arch.getMemory().read();
+	    assertEquals(26, arch.getExtbus1().get());
+		
+	    // In the end of the execution, the position 26 of the memory must store -5
+	    arch.getExtbus1().put(26);
+	    arch.getMemory().read();
+	    assertEquals(25, arch.getExtbus1().get());
+	    
+	    // The value stored into the Register 1 must be 25
+	    arch.getRPG1().internalRead();
+	    assertEquals(25, arch.getIntbus1().get());
+		
+		//Testing if PC points to 3 positions after the original
+		//PC was pointing to 20; now it must be pointing to 23
+		arch.getPC().read();
+		assertEquals(23, arch.getExtbus1().get());
+		
+		// The flag bit zero must be 0, and bit negative must be 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));		
+	}
+	
+	@Test
+	public void testJlw() {
+		
+		Architecture arch = new Architecture();
+		
+		// storing the number 0 in the memory, in position 31
+		arch.getMemory().getDataList()[31]=0;
+		// storing the number 1 in the memory, in position 32
+		arch.getMemory().getDataList()[32]=1;
+		// Stores the number 50 in the position 33 of the memory
+	    arch.getMemory().getDataList()[33] = 50;
+		
+	    // Making PC points to position 30
+  		arch.getExtbus1().put(30);
+  		arch.getPC().store();
+	    
+	    // Now setting the registers values
+	    arch.getIntbus1().put(5);
+	    arch.getRPG0().internalStore(); // RPG0 has 5
+	    arch.getIntbus1().put(7);
+	    arch.getRPG1().internalStore(); // RPG1 has 7
+		
+	    // Executing the command jlw
+	    arch.jlw();
+	    
+	    // The value stored into the Register 0 must be 5
+	    arch.getRPG0().internalRead();
+		assertEquals(5, arch.getIntbus1().get());
+		// The value stored into the Register 1 must be 7
+		arch.getRPG1().internalRead();
+		assertEquals(7, arch.getIntbus1().get());
+
+		arch.getPC().read();
+		assertEquals(50, arch.getExtbus1().get());
+
+		// The flag bit zero must be 0, and bit negative must be 1
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(1, arch.getFlags().getBit(1));	
+	}
+	
+	@Test
 	public void testFillCommandsList() {
 		
 		//all the instructions must be in Commands List
@@ -942,6 +1099,9 @@ public class TestArchitecture {
 		assertTrue("jgt".equals(commands.get(14)));
 		assertTrue("addImmReg".equals(commands.get(15)));
 		assertTrue("moveMemReg".equals(commands.get(16)));
+		assertTrue("subRegReg".equals(commands.get(17)));
+		assertTrue("moveRegMem".equals(commands.get(18)));
+		assertTrue("jlw".equals(commands.get(19)));
 	}
 	
 	@Test
