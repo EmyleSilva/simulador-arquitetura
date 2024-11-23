@@ -1,3 +1,4 @@
+
 package architecture;
 
 import java.io.BufferedReader;
@@ -194,24 +195,26 @@ public class Architecture {
 	 */
 	protected void fillCommandsList() {
 		commandsList = new ArrayList<String>();
-		commandsList.add("add");   //0
-		commandsList.add("sub");   //1
-		commandsList.add("jmp");   //2
-		commandsList.add("jz");    //3
-		commandsList.add("jn");    //4
-		commandsList.add("read");  //5
-		commandsList.add("store"); //6
-		commandsList.add("ldi");   //7
-		commandsList.add("inc");   //8		
-		commandsList.add("moveRegReg"); //9
-		commandsList.add("addMemReg"); //10
-		commandsList.add("subRegMem"); //11
-		commandsList.add("moveImmReg");//12
-		commandsList.add("jeq");   //13
-		commandsList.add("jgt");   //14
+		commandsList.add("add");         //0
+		commandsList.add("sub");         //1
+		commandsList.add("jmp");         //2
+		commandsList.add("jz");          //3
+		commandsList.add("jn");          //4
+		commandsList.add("read");        //5
+		commandsList.add("store");       //6
+		commandsList.add("ldi");         //7
+		commandsList.add("inc");         //8		
+		commandsList.add("moveRegReg");  //9
+		commandsList.add("addMemReg");   //10
+		commandsList.add("subRegMem");   //11
+		commandsList.add("moveImmReg");  //12
+		commandsList.add("jeq");         //13
+		commandsList.add("jgt");         //14
 		commandsList.add("addImmReg");   //15
-		commandsList.add("moveMemReg");   //16
+		commandsList.add("moveMemReg");  //16
 		commandsList.add("subRegReg");   //17
+		commandsList.add("moveRegMem");  //18
+		commandsList.add("jlw");         //19
 	}
 
 	
@@ -472,15 +475,19 @@ public class Architecture {
 		ula.internalStore(1);
 		ula.inc();
 		ula.internalRead(1);
-		PC.internalStore();//now PC points to the parameter address
+		PC.internalStore();// now PC points to the parameter address
+		
 		PC.read();
 		memory.read();// now the parameter value (address of the jz) is in the external bus
-		statusMemory.storeIn1(); //the address is in position 1 of the status memory
+		statusMemory.storeIn1(); // the address is in position 1 of the status memory
+		
 		ula.inc();
 		ula.internalRead(1);
-		PC.internalStore();//now PC points to the next instruction
+		PC.internalStore();// now PC points to the next instruction
+		
 		PC.read();//now the bus has the next istruction address
 		statusMemory.storeIn0(); //the address is in the position 0 of the status memory
+		
 		extbus1.put(Flags.getBit(1)); //the ZERO bit is in the external bus 
 		statusMemory.read(); //gets the correct address (next instruction or parameter address)
 		PC.store(); //stores into PC
@@ -982,34 +989,29 @@ public class Architecture {
 	    ula.internalRead(1);
 	    PC.internalStore();
 
-		// armazena RegA em IR
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		registersRead();
-		IR.internalStore();
-		
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-
-		// armazena RegB em ULA(0)
+		// armazena RegA em ULA(0)
 		PC.read();
 		memory.read();
 		demux.setValue(extbus1.get());
 		registersInternalRead();
 		ula.store(0);
 		
-		// recupera RegA de IR e armazena em ULA(1)
-		IR.internalRead();
-		ula.internalStore(1);
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// armazena RegB em ULA(1)
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(1);
 
 		// realiza a operação de subtração e armazena em RegB
 		ula.sub();
 		ula.read(1);
 		setStatusFlags(intbus2.get());
-		//demux.setValue(extbus1.get());
 		registersInternalStore();
 
 		// PC++
@@ -1018,10 +1020,10 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore();
-		
 	}
-	/*
+	
 	public void moveRegMem() {
+	
 		// PC++
 		PC.internalRead();
 		ula.internalStore(1);
@@ -1029,13 +1031,12 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 
-		// acessa RegA e posiciona em ula(0)
+		// acessa RegA e posiciona em IR
 		PC.read();
 		memory.read();
 		demux.setValue(extbus1.get());
-		registersInternalRead();
-		ula.store(0);
-		ula.read(0);
+		registersRead();
+		IR.internalStore();
 
 		// "PC++"
 		ula.inc();
@@ -1055,7 +1056,69 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore();
-	}*/
+	}
+	
+	// jlw %<regA> %<regB> <mem> || se RegA<RegB então PC <- mem (desvio condicional)
+	public void jlw() {
+		
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// lê o dado de RegA
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// lê o dado de RegB e armazena em IR
+		PC.read();
+		memory.read();
+		IR.store();
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// JUMP 1
+		PC.read();
+		memory.read();
+		statusMemory.storeIn1();
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// JUMP 0
+		PC.read();
+		statusMemory.storeIn0();
+		
+		// coloca o dado de RegB em ULA(1)
+		IR.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(1);
+		
+		// realiza a subtração e verifica o bit negativo
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		extbus1.put(Flags.getBit(1));
+		statusMemory.read();
+		PC.store();
+			
+	}
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
