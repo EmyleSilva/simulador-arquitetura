@@ -1120,6 +1120,150 @@ public class Architecture {
 			
 	}
 	
+	//add %<regA> <mem>      || Memória[mem] <- RegA + memória[mem]
+	public void addRegMem() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.read();
+	    IR.store();
+	    IR.internalRead();
+	    ula.internalStore(1);
+	    
+	    ula.add();
+	    ula.internalRead(1);
+	    IR.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.store();
+	    IR.read();
+	    memory.store();
+	    
+	   
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+	
+	
+	//sub imm %<regA>        || RegA <- imm - RegA
+	public void subImmReg(){
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    PC.read();
+	    memory.read();
+	    IR.store();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(1);
+	    IR.internalRead();
+	    ula.internalStore(0); 
+	    ula.sub();
+	    ula.read(1);
+	    setStatusFlags(intbus1.get());
+	    registersInternalStore();
+
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+	
+	//inc %<regA>   || RegA ++
+	public void incReg(){
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.inc();
+	    ula.read(1);
+	    registersInternalStore();
+
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+	
+	public void jneq(){
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    statusMemory.storeIn0();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    statusMemory.storeIn1();
+	    
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    extbus1.put(Flags.getBit(0));
+	    statusMemory.read();
+	    PC.store();;
+	}
+
+
+
+	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
 	}
