@@ -1,0 +1,39 @@
+# Diretórios de compilação
+/bin
+/build
+/out
+
+# Logs
+*.log
+
+# Maven
+/target
+.settings.xml
+
+# Gradle
+/.gradle
+/build
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+/.idea/
+/*.iml
+/out/
+
+# Arquivos temporários e backups
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
