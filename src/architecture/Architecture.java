@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 import components.Bus;
 import components.Demux;
 import components.Memory;
@@ -18,7 +17,6 @@ public class Architecture {
 	
 	private boolean simulation; //this boolean indicates if the execution is done in simulation mode.
 								//simulation mode shows the components' status after each instruction
-	
 	
 	private boolean halt;
 	private Bus extbus1;
@@ -41,7 +39,6 @@ public class Architecture {
 	
 	private ArrayList<String> commandsList;
 	private ArrayList<Register> registersList;
-	
 	
 
 	/**
@@ -71,7 +68,7 @@ public class Architecture {
 		
 		fillCommandsList();
 	}
-
+	
 	/**
 	 * This method fills the registers list inserting into them all the registers we have.
 	 * IMPORTANT!
@@ -107,8 +104,6 @@ public class Architecture {
 		//in this constructor we can set the simoualtion mode on or off
 		simulation = sim;
 	}
-
-
 
 	//getters
 	
@@ -172,8 +167,6 @@ public class Architecture {
 		return commandsList;
 	}
 
-
-
 	//all the microprograms must be impemented here
 	//the instructions table is
 	/*
@@ -196,27 +189,34 @@ public class Architecture {
 	protected void fillCommandsList() {
 		commandsList = new ArrayList<String>();
 		commandsList.add("add");         //0
-		commandsList.add("sub");         //1
-		commandsList.add("jmp");         //2
-		commandsList.add("jz");          //3
-		commandsList.add("jn");          //4
-		commandsList.add("read");        //5
-		commandsList.add("store");       //6
-		commandsList.add("ldi");         //7
-		commandsList.add("inc");         //8		
-		commandsList.add("moveRegReg");  //9
-		commandsList.add("addMemReg");   //10
-		commandsList.add("subRegMem");   //11
-		commandsList.add("moveImmReg");  //12
-		commandsList.add("jeq");         //13
-		commandsList.add("jgt");         //14
-		commandsList.add("addImmReg");   //15
-		commandsList.add("moveMemReg");  //16
-		commandsList.add("subRegReg");   //17
-		commandsList.add("moveRegMem");  //18
-		commandsList.add("jlw");         //19
-		commandsList.add("addRegReg");   //20
-		commandsList.add("subMemReg");   //21
+		commandsList.add("addRegReg");   //1
+		commandsList.add("addMemReg");   //2
+		commandsList.add("addRegMem");   //3
+		commandsList.add("addImmReg");   //4
+		commandsList.add("sub");         //5
+		commandsList.add("subRegReg");   //6
+		commandsList.add("subMemReg");   //7
+		commandsList.add("subRegMem");   //8
+		commandsList.add("subImmReg");   //9
+		commandsList.add("imulMemReg");  //10
+		commandsList.add("imulRegMem");  //11
+		commandsList.add("imulRegReg");  //12
+		commandsList.add("moveMemReg");  //13
+		commandsList.add("moveRegMem");  //14
+		commandsList.add("moveRegReg");  //15
+		commandsList.add("moveImmReg");  //16
+		commandsList.add("inc");  	     //17
+		commandsList.add("incReg");	     //18
+		commandsList.add("jmp");         //19
+		commandsList.add("jn");          //20
+		commandsList.add("jz");          //21
+		commandsList.add("jeq");         //22
+		commandsList.add("jneq");        //23
+		commandsList.add("jgt");         //24
+		commandsList.add("jlw");         //25
+		commandsList.add("read");        //26
+		commandsList.add("store");       //27
+		commandsList.add("ldi");         //28
 	}
 
 	
@@ -298,6 +298,157 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
 	
+	//add %<regA> %<regB>    || RegB <- RegA + RegB
+	public void addRegReg() {
+		// Incrementa PC para o primeiro parâmetro
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+
+	    PC.internalStore(); // PC aponta para regA
+
+	    // Lê regA
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get()); // Seleciona regA
+	    registersInternalRead(); // Coloca o valor de regA no intbus1
+	    ula.store(0); // Armazena regA na ULA (posição 0)
+
+	    // Incrementa PC para o segundo parâmetro
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore(); // PC aponta para regB
+
+	    // Lê regB
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get()); // Seleciona regB
+	    registersInternalRead(); // Coloca o valor de regB no intbus1
+	    ula.store(1); // Armazena regB na ULA (posição 1)
+
+	    // Realiza a soma
+	    ula.add();
+	    ula.read(1); // Resultado é colocado no intbus2
+		setStatusFlags(intbus2.get());
+
+	    // Atualiza o demux para apontar para regB (onde o resultado será armazenado)
+	    demux.setValue(extbus1.get()); // Seleciona regB
+	    registersInternalStore(); // Armazena o resultado em regB
+
+	    // Incrementa PC para a próxima instrução
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+	public void addMemReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read();
+		memory.read();
+		memory.read();
+		IR.store(); //Valor da memoria agora esta em IR
+		ula.inc();
+		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no bus2
+		PC.internalStore();
+		PC.read();
+		memory.read(); //Devolve o ID do RPG
+		demux.setValue(extbus1.get());
+		registersInternalRead(); //O registrador coloca o dado no intbus1
+		ula.store(1);
+		IR.internalRead();
+		ula.internalStore(0);
+		ula.add();
+		ula.read(1);
+		setStatusFlags(intbus2.get());
+		registersInternalStore();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();		
+	}
+
+	//add %<regA> <mem>      || Memória[mem] <- RegA + memória[mem]
+	public void addRegMem() {
+		PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+		PC.internalStore();
+	    
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.read();
+	    IR.store();
+	    IR.internalRead();
+	    ula.internalStore(1);
+	    
+	    ula.add();
+	    ula.internalRead(1);
+	    IR.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.store();
+	    IR.read();
+	    memory.store();
+	    
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	
+	}
+
+	public void addImmReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		PC.read();
+		memory.read(); //Devolve o valor imediato
+		IR.store(); //Armazena o valor imediato no IR
+		ula.inc();
+		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no intbus2
+		PC.internalStore();
+		PC.read();
+		memory.read(); //Devolve o ID do RPG
+		demux.setValue(extbus1.get());
+		registersInternalRead(); //O registrador coloca o dado no intbus1
+		ula.store(1);
+		IR.internalRead();
+		ula.internalStore(0);
+		ula.add();
+		ula.read(1);
+		setStatusFlags(intbus2.get());
+		registersInternalStore();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();		
+	}
 
 	/**
 	 * This method implements the microprogram for
@@ -360,7 +511,372 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
+
+	public void subRegReg() {
+		
+		// PC++
+		PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+		// Armazena RegA em ULA(0)
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// Armazena RegB em ULA(1)
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(1);
+
+		// Realiza a operação de subtração e armazena em RegB
+		ula.sub();
+		ula.read(1);
+		setStatusFlags(intbus2.get());
+		registersInternalStore();
+
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	//sub <mem> %<regA>      || RegA <- memória[mem] - RegA
+	public void subMemReg() {
+	    // Incrementa PC para o endereço da memória
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    // Lê o valor da memória
+	    PC.read();
+	    memory.read();
+	    memory.read(); // Coloca o valor que está na memória no extbus1
+	    IR.store(); // Armazena o valor que estava na memória no IR
+
+	    // Incrementa PC para apontar para o registrador
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    // Lê regA
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get()); // Seleciona regA
+	    registersInternalRead(); // Coloca o valor de regA no intbus1
+	    ula.store(1); // Armazena regA na ULA (posição 1)
+
+	    // Realiza a subtração
+	    IR.internalRead(); // Coloca o valor que está na memória no intbus2
+	    ula.internalStore(0);
+	    ula.sub();
+	    ula.read(1);
+		 // Resultado é colocado no intbus2
+	    registersInternalStore(); // Armazena o resultado em regA
+
+	    // Incrementa PC para a próxima instrução
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+	public void subRegMem() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		registersInternalRead(); 
+		ula.store(0);
+		PC.read(); 
+		memory.read();
+		memory.read(); 
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		IR.internalStore();
+		PC.read();
+		memory.read();
+		memory.store();
+		IR.read();
+		memory.store();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	//sub imm %<regA>        || RegA <- imm - RegA
+	public void subImmReg(){
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read();
+	    memory.read();
+	    IR.store();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(1);
+	    IR.internalRead();
+	    ula.internalStore(0); 
+	    ula.sub();
+	    ula.read(1);
+	    setStatusFlags(intbus1.get());
+	    registersInternalStore();
+	    
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+	/* public void imulMemReg(){
+
+	}
+
+	public void imulRegMem(){
+
+	}
+
+	public void imulRegReg(){
+		
+	} */
+
+	public void moveMemReg() {
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); // Now PC points to the first parameter
+		PC.read(); 
+		memory.read(); // The address memory is now in the external bus.
+		memory.read(); // The data memory is now in the external bus.
+		IR.store();
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); // Now PC points to the second parameter (the second reg id)
+		PC.read();
+		memory.read(); // The register id is now in the external bus.
+		demux.setValue(extbus1.get()); // Points to the correct register
+		IR.internalRead();
+		registersStore(); // Performs an internal store for the register identified into demux bus
+		PC.internalRead(); // We need to make PC points to the next instruction address
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //Now PC points to the next instruction. We go back to the FETCH status.
+	}
+
+	public void moveRegMem() {
 	
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// Acessa RegA e posiciona em IR
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersRead();
+		IR.internalStore();
+
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		// Acessa memoria[mem] no modo store e armazena RegA nessa posição de memória
+		PC.read();
+		memory.read();
+		memory.store();
+		IR.read();
+		memory.store();
+
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	/**
+	 * This method implements the microprogram for
+	 * 					move <reg1> <reg2> 
+	 * In the machine language this command number is 9
+	 *    
+	 * The method reads the two register ids (<reg1> and <reg2>) from the memory, in positions just after the command, and
+	 * copies the value from the <reg1> register to the <reg2> register
+	 * 
+	 * 1. pc -> intbus2 //pc.read()
+	 * 2. ula <-  intbus2 //ula.store()
+	 * 3. ula incs
+	 * 4. ula -> intbus2 //ula.read()
+	 * 5. pc <- intbus2 //pc.store() now pc points to the first parameter
+	 * 6. pc -> extbus //(pc.read())the address where is the position to be read is now in the external bus 
+	 * 7. memory reads from extbus //this forces memory to write the parameter (first regID) in the extbus
+	 * 8. pc -> intbus2 //pc.read() //getting the second parameter
+	 * 9. ula <-  intbus2 //ula.store()
+	 * 10. ula incs
+	 * 11. ula -> intbus2 //ula.read()
+	 * 12. pc <- intbus2 //pc.store() now pc points to the second parameter
+	 * 13. demux <- extbus //now the register to be operated is selected
+	 * 14. registers -> intbus1 //this performs the internal reading of the selected register 
+	 * 15. PC -> extbus (pc.read())the address where is the position to be read is now in the external bus 
+	 * 16. memory reads from extbus //this forces memory to write the parameter (second regID) in the extbus
+	 * 17. demux <- extbus //now the register to be operated is selected
+	 * 18. registers <- intbus1 //thid rerforms the external reading of the register identified in the extbus
+	 * 19. 10. pc -> intbus2 //pc.read() now pc must point the next instruction address
+	 * 20. ula <- intbus2 //ula.store()
+	 * 21. ula incs
+	 * 22. ula -> intbus2 //ula.read()
+	 * 23. pc <- intbus2 //pc.store()  
+	 * 		  
+	 */
+	
+	//move %<regA> %<regB>   || RegB <- RegA
+	public void moveRegReg() {		
+	    // Incrementa PC para o primeiro parâmetro
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore(); // PC aponta para regA
+	    PC.read();
+	    memory.read();  // Lê regA // The first register id is now in the external bus.
+	    
+	    //Now PC points to the second parameter (the second reg id)
+	    PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+	    demux.setValue(extbus1.get()); // Seleciona regA
+	    registersInternalRead(); //Starts the read from the register identified into demux bus // Coloca o valor de regA no intbus1
+		PC.read();
+		memory.read(); // The second register id is now in the external bus.
+		
+		demux.setValue(extbus1.get()); // Seleciona regB //Points to the correct register
+		registersInternalStore(); //Performs an internal store for the register identified into demux bus
+
+		//Make PC points to the next instruction address // Incrementa PC para a próxima instrução
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+	public void moveImmReg() {
+        PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		PC.read(); 
+		memory.read(); 
+		IR.store(); 
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		IR.internalRead();
+		registersStore();
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	/**
+	 * This method implements the microprogram for
+	 * 					inc 
+	 * In the machine language this command number is 8
+	 *    
+	 * The method moves the value in rpg (the first register in the register list)
+	 *  into the ula and performs an inc method
+	 * 		-> inc works just like add rpg (the first register in the register list)
+	 *         with the mumber 1 stored into the memory
+	 * 		-> however, inc consumes lower amount of cycles  
+	 * 
+	 * The logic is
+	 * 
+	 * 1. rpg -> intbus1 //rpg.read()
+	 * 2. ula  <- intbus1 //ula.store()
+	 * 3. Flags <- zero //the status flags are reset
+	 * 4. ula incs
+	 * 5. ula -> intbus1 //ula.read()
+	 * 6. ChangeFlags //informations about flags are set according the result
+	 * 7. rpg <- intbus1 //rpg.store()
+	 * 8. pc -> intbus2 //pc.read() now pc must point the next instruction address
+	 * 9. ula <- intbus2 //ula.store()
+	 * 10. ula incs
+	 * 11. ula -> intbus2 //ula.read()
+	 * 12. pc <- intbus2 //pc.store()
+	 * end
+	 * @param address
+	 */
+	public void inc() {
+		RPG0.internalRead();
+		ula.store(1);
+		ula.inc();
+		ula.read(1);
+		setStatusFlags(intbus1.get());
+		RPG0.internalStore();
+		PC.internalRead(); //we need to make PC points to the next instruction address
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
+	}
+
 	/**
 	 * This method implements the microprogram for
 	 * 					JMP address
@@ -698,269 +1214,6 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
 	
-	/**
-	 * This method implements the microprogram for
-	 * 					inc 
-	 * In the machine language this command number is 8
-	 *    
-	 * The method moves the value in rpg (the first register in the register list)
-	 *  into the ula and performs an inc method
-	 * 		-> inc works just like add rpg (the first register in the register list)
-	 *         with the mumber 1 stored into the memory
-	 * 		-> however, inc consumes lower amount of cycles  
-	 * 
-	 * The logic is
-	 * 
-	 * 1. rpg -> intbus1 //rpg.read()
-	 * 2. ula  <- intbus1 //ula.store()
-	 * 3. Flags <- zero //the status flags are reset
-	 * 4. ula incs
-	 * 5. ula -> intbus1 //ula.read()
-	 * 6. ChangeFlags //informations about flags are set according the result
-	 * 7. rpg <- intbus1 //rpg.store()
-	 * 8. pc -> intbus2 //pc.read() now pc must point the next instruction address
-	 * 9. ula <- intbus2 //ula.store()
-	 * 10. ula incs
-	 * 11. ula -> intbus2 //ula.read()
-	 * 12. pc <- intbus2 //pc.store()
-	 * end
-	 * @param address
-	 */
-	public void inc() {
-		RPG0.internalRead();
-		ula.store(1);
-		ula.inc();
-		ula.read(1);
-		setStatusFlags(intbus1.get());
-		RPG0.internalStore();
-		PC.internalRead(); //we need to make PC points to the next instruction address
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
-	
-	/**
-	 * This method implements the microprogram for
-	 * 					move <reg1> <reg2> 
-	 * In the machine language this command number is 9
-	 *    
-	 * The method reads the two register ids (<reg1> and <reg2>) from the memory, in positions just after the command, and
-	 * copies the value from the <reg1> register to the <reg2> register
-	 * 
-	 * 1. pc -> intbus2 //pc.read()
-	 * 2. ula <-  intbus2 //ula.store()
-	 * 3. ula incs
-	 * 4. ula -> intbus2 //ula.read()
-	 * 5. pc <- intbus2 //pc.store() now pc points to the first parameter
-	 * 6. pc -> extbus //(pc.read())the address where is the position to be read is now in the external bus 
-	 * 7. memory reads from extbus //this forces memory to write the parameter (first regID) in the extbus
-	 * 8. pc -> intbus2 //pc.read() //getting the second parameter
-	 * 9. ula <-  intbus2 //ula.store()
-	 * 10. ula incs
-	 * 11. ula -> intbus2 //ula.read()
-	 * 12. pc <- intbus2 //pc.store() now pc points to the second parameter
-	 * 13. demux <- extbus //now the register to be operated is selected
-	 * 14. registers -> intbus1 //this performs the internal reading of the selected register 
-	 * 15. PC -> extbus (pc.read())the address where is the position to be read is now in the external bus 
-	 * 16. memory reads from extbus //this forces memory to write the parameter (second regID) in the extbus
-	 * 17. demux <- extbus //now the register to be operated is selected
-	 * 18. registers <- intbus1 //thid rerforms the external reading of the register identified in the extbus
-	 * 19. 10. pc -> intbus2 //pc.read() now pc must point the next instruction address
-	 * 20. ula <- intbus2 //ula.store()
-	 * 21. ula incs
-	 * 22. ula -> intbus2 //ula.read()
-	 * 23. pc <- intbus2 //pc.store()  
-	 * 		  
-	 */
-	
-	//move %<regA> %<regB>   || RegB <- RegA
-	public void moveRegReg() {		
-	    // Incrementa PC para o primeiro parâmetro
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore(); // PC aponta para regA
-	    PC.read();
-	    memory.read();  // Lê regA // The first register id is now in the external bus.
-	    
-	    //Now PC points to the second parameter (the second reg id)
-	    PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-	    demux.setValue(extbus1.get()); // Seleciona regA
-	    registersInternalRead(); //Starts the read from the register identified into demux bus // Coloca o valor de regA no intbus1
-		PC.read();
-		memory.read(); // The second register id is now in the external bus.
-		
-		demux.setValue(extbus1.get()); // Seleciona regB //Points to the correct register
-		registersInternalStore(); //Performs an internal store for the register identified into demux bus
-
-		//Make PC points to the next instruction address // Incrementa PC para a próxima instrução
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	}
-
-	public void moveMemReg() {
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the first parameter
-		PC.read(); 
-		memory.read(); // the address memory is now in the external bus.
-		memory.read(); // the data memory is now in the external bus.
-		IR.store();
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the second parameter (the second reg id)
-		PC.read();
-		memory.read(); // the register id is now in the external bus.
-		demux.setValue(extbus1.get()); //points to the correct register
-		IR.internalRead();
-		registersStore(); //performs an internal store for the register identified into demux bus
-		PC.internalRead(); //we need to make PC points to the next instruction address
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
-	
-	public void addMemReg() {
-        PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		PC.read();
-		memory.read();
-		memory.read();
-		IR.store(); //Valor da memoria agora esta em IR
-		ula.inc();
-		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no bus2
-		PC.internalStore();
-		PC.read();
-		memory.read(); //Devolve o ID do RPG
-		demux.setValue(extbus1.get());
-		registersInternalRead(); //O registrador coloca o dado no intbus1
-		ula.store(1);
-		IR.internalRead();
-		ula.internalStore(0);
-		ula.add();
-		ula.read(1);
-		registersInternalStore();
-		
-		
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();		
-	}
-
-	public void addImmReg() {
-        PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-
-		PC.read();
-		memory.read(); //Devolve o valor imediato
-		IR.store(); //armazena o valor imediato no IR
-		ula.inc();
-		ula.internalRead(1); //Ula incrementa o valor de PC e escreve no intbus2
-		PC.internalStore();
-		PC.read();
-		memory.read(); //Devolve o ID do RPG
-		demux.setValue(extbus1.get());
-		registersInternalRead(); //O registrador coloca o dado no intbus1
-		ula.store(1);
-		IR.internalRead();
-		ula.internalStore(0);
-		ula.add();
-		ula.read(1);
-		registersInternalStore();
-		
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();		
-	}	
-	
-	public void subRegMem() {
-        PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		registersInternalRead(); 
-		ula.store(0);
-		PC.read(); 
-		memory.read();
-		memory.read(); 
-		IR.store();
-		IR.internalRead();
-		ula.internalStore(1);
-		ula.sub();
-		ula.internalRead(1);
-		setStatusFlags(intbus2.get());
-		IR.internalStore();
-		PC.read();
-		memory.read();
-		memory.store();
-		IR.read();
-		memory.store();
-		
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-	}
-	
-	public void moveImmReg() {
-        PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		PC.read(); 
-		memory.read(); 
-		IR.store(); 
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		IR.internalRead();
-		registersStore();
-		
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-	}
-	
 	public void jeq() {
 	    PC.internalRead();
 	    ula.internalStore(1);
@@ -1003,84 +1256,6 @@ public class Architecture {
 	    PC.store();
 	}
 	
-	public void subRegReg() {
-		
-		// PC++
-		PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-
-		// armazena RegA em ULA(0)
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		registersInternalRead();
-		ula.store(0);
-		
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-
-		// armazena RegB em ULA(1)
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		registersInternalRead();
-		ula.store(1);
-
-		// realiza a operação de subtração e armazena em RegB
-		ula.sub();
-		ula.read(1);
-		setStatusFlags(intbus2.get());
-		registersInternalStore();
-
-		// PC++
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-	}
-	
-	public void moveRegMem() {
-	
-		// PC++
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-
-		// acessa RegA e posiciona em IR
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		registersRead();
-		IR.internalStore();
-
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-
-		// acessa memoria[mem] no modo store e armazena RegA nessa posição de memória
-		PC.read();
-		memory.read();
-		memory.store();
-		IR.read();
-		memory.store();
-
-		// PC++
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-	}
-	
 	// jlw %<regA> %<regB> <mem> || se RegA<RegB então PC <- mem (desvio condicional)
 	public void jlw() {
 		
@@ -1103,7 +1278,7 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 		
-		// lê o dado de RegB e armazena em IR
+		// Lê o dado de RegB e armazena em IR
 		PC.read();
 		memory.read();
 		IR.store();
@@ -1127,13 +1302,13 @@ public class Architecture {
 		PC.read();
 		statusMemory.storeIn0();
 		
-		// coloca o dado de RegB em ULA(1)
+		// Coloca o dado de RegB em ULA(1)
 		IR.read();
 		demux.setValue(extbus1.get());
 		registersInternalRead();
 		ula.store(1);
 		
-		// realiza a subtração e verifica o bit negativo
+		// Raliza a subtração e verifica o bit negativo
 		ula.sub();
 		ula.internalRead(1);
 		setStatusFlags(intbus2.get());
@@ -1142,167 +1317,19 @@ public class Architecture {
 		PC.store();
 			
 	}
-	
-	//add %<regA> <mem>      || Memória[mem] <- RegA + memória[mem]
-	public void addRegMem() {
-		PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-		PC.internalStore();
-	    
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    registersInternalRead();
-	    ula.store(0);
-	    
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    memory.read();
-	    IR.store();
-	    IR.internalRead();
-	    ula.internalStore(1);
-	    
-	    ula.add();
-	    ula.internalRead(1);
-	    IR.internalStore();
-	    PC.read();
-	    memory.read();
-	    memory.store();
-	    IR.read();
-	    memory.store();
-	    
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	
+
+	public void imulMemReg(){
+
 	}
-	//add %<regA> %<regB>    || RegB <- RegA + RegB
-	public void addRegReg() {
-		// Incrementa PC para o primeiro parâmetro
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
 
-	    PC.internalStore(); // PC aponta para regA
+	public void imulRegMem(){
 
-	    // Lê regA
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get()); // Seleciona regA
-	    registersInternalRead(); // Coloca o valor de regA no intbus1
-	    ula.store(0); // Armazena regA na ULA (posição 0)
-
-	    // Incrementa PC para o segundo parâmetro
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore(); // PC aponta para regB
-
-	    // Lê regB
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get()); // Seleciona regB
-	    registersInternalRead(); // Coloca o valor de regB no intbus1
-	    ula.store(1); // Armazena regB na ULA (posição 1)
-
-	    // Realiza a soma
-	    ula.add();
-	    ula.read(1); // Resultado é colocado no intbus2
-
-	    // Atualiza o demux para apontar para regB (onde o resultado será armazenado)
-	    demux.setValue(extbus1.get()); // Seleciona regB
-	    registersInternalStore(); // Armazena o resultado em regB
-
-	    // Incrementa PC para a próxima instrução
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
 	}
-	
-	//sub imm %<regA>        || RegA <- imm - RegA
-	public void subImmReg(){
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
+
+	public void imulRegReg(){
 		
-		PC.read();
-	    memory.read();
-	    IR.store();
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    registersInternalRead();
-	    ula.store(1);
-	    IR.internalRead();
-	    ula.internalStore(0); 
-	    ula.sub();
-	    ula.read(1);
-	    setStatusFlags(intbus1.get());
-	    registersInternalStore();
-	    
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
 	}
-	
-	//sub <mem> %<regA>      || RegA <- memória[mem] - RegA
-	public void subMemReg() {
-	    // Incrementa PC para o endereço da memória
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
 
-	    // Lê o valor da memória
-	    PC.read();
-	    memory.read();
-	    memory.read(); // Coloca o valor que está na memória no extbus1
-	    IR.store(); // Armazena o valor que estava na memória no IR
-
-	    // Incrementa PC para apontar para o registrador
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-
-	    // Lê regA
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get()); // Seleciona regA
-	    registersInternalRead(); // Coloca o valor de regA no intbus1
-	    ula.store(1); // Armazena regA na ULA (posição 1)
-
-	    // Realiza a subtração
-	    IR.internalRead(); // Coloca o valor que está na memória no intbus2
-	    ula.internalStore(0);
-	    ula.sub();
-	    ula.read(1); // Resultado é colocado no intbus2
-	    registersInternalStore(); // Armazena o resultado em regA
-
-	    // Incrementa PC para a próxima instrução
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	}
-	
 	//inc %<regA>   || RegA ++
 	public void incReg(){
 	    PC.internalRead();
@@ -1318,6 +1345,7 @@ public class Architecture {
 	    ula.store(1);
 	    ula.inc();
 	    ula.read(1);
+		setStatusFlags(intbus2.get());
 	    registersInternalStore();
 
 	    PC.internalRead();
@@ -1439,13 +1467,13 @@ public class Architecture {
 
 	}
 	
-
 	/**
 	 * This method implements The decode proccess,
 	 * that is to find the correct operation do be executed
 	 * according the command.
 	 * And the execute proccess, that is the execution itself of the command
 	 */
+
 	private void decodeExecute() {
 		IR.internalRead(); //the instruction is in the internalbus2
 		int command = intbus2.get();
@@ -1455,34 +1483,113 @@ public class Architecture {
 			add();
 			break;
 		case 1:
-			sub();
+			addRegReg();
 			break;
 		case 2:
-			jmp();
+			addMemReg();
 			break;
 		case 3:
-			jz();
+			addRegMem();
 			break;
 		case 4:
-			jn();
+			addImmReg();
 			break;
 		case 5:
-			read();
+			sub();
 			break;
+
 		case 6:
-			store();
+			subRegReg();
 			break;
+		
 		case 7:
-			ldi();
+			subMemReg();
 			break;
+		
 		case 8:
-			inc();
+			subRegMem();
 			break;
+		
 		case 9:
+			subImmReg();
+			break;
+		
+		case 10:
+			imulMemReg(); //Linha 1310
+			break;
+
+		case 11:
+			imulRegMem(); //Linha 1314
+			break;
+
+		case 12:
+			imulRegReg(); //Linha 
+			break;
+
+		case 13:
+			moveMemReg();
+			break;
+
+		case 14:
+			moveRegMem();
+			break;
+
+		case 15:
 			moveRegReg();
 			break;
-		case 10:
-			subRegReg();
+		
+		case 16:
+			moveImmReg();
+			break;
+
+		case 17:
+			inc();
+			break;
+
+		case 18:
+			incReg();
+			break;
+
+		case 19:
+			jmp();
+			break;
+	
+		case 20:
+			jn();
+			break;
+
+		case 21:
+			jz();
+			break;
+			
+		case 22:
+			jeq();
+			break;
+
+		case 23:
+			jneq();
+			break;
+
+		case 24:
+			jgt();
+			break;
+
+		case 25:
+			jlw();
+			break;
+
+		case 26:
+			read();
+			break;
+
+		case 27:
+			store();
+			break;
+			
+		case 28:
+			ldi();
+			break;
+
 		default:
 			halt = true;
 			break;
