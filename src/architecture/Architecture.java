@@ -668,7 +668,7 @@ public class Architecture {
 	    PC.internalStore();
 	}
 
-	/* public void imulMemReg(){
+	public void imulMemReg(){
 
 	}
 
@@ -678,7 +678,7 @@ public class Architecture {
 
 	public void imulRegReg(){
 		
-	} */
+	}
 
 	public void moveMemReg() {
 		PC.internalRead();
@@ -876,6 +876,32 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
+	
+	//inc %<regA>   || RegA ++
+	public void incReg(){
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.inc();
+	    ula.read(1);
+		setStatusFlags(intbus2.get());
+	    registersInternalStore();
+
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+		
 
 	/**
 	 * This method implements the microprogram for
@@ -907,6 +933,59 @@ public class Architecture {
 		PC.read();
 		memory.read();
 		PC.store();
+	}
+	
+	/**
+	 * This method implements the microprogram for
+	 * 					jn address
+	 * In the machine language this command number is 4, and the address is in the position next to him
+	 *    
+	 * where address is a valid position in this memory architecture (where 
+	 * the PC is redirected to, but only in the case the NEGATIVE bit in Flags is 1)
+	 * The method reads the value from memory (position address) and 
+	 * inserts it into the PC register if the NEG bit in Flags register is setted.
+	 * So, the program is deviated conditionally
+	 * The logic is
+	 * 1. pc -> intbus2 //pc.read()
+	 * 2. ula <-  intbus2 //ula.store()
+	 * 3. ula incs
+	 * 4. ula -> intbus2 //ula.read()
+	 * 5. pc <- intbus2 //pc.internalstore() now pc points to the parameter
+	 * 6. pc -> extbus1 //pc.read() now the parameter address is in the extbus1
+	 * 7. Memory -> extbus1 //memory.read() the address (if jn) is in external bus 1
+	 * 8. statusMemory(1)<- extbus1 // statusMemory.storeIn1()
+	 * 9. ula incs
+	 * 10. ula -> intbus2 //ula.read()
+	 * 11. PC <- intbus2 // PC.internalStore() PC is now pointing to next instruction
+	 * 12. PC -> extbus1 // PC.read() the next instruction address is in the extbus
+	 * 13. statusMemory(0)<- extbus1 // statusMemory.storeIn0()
+	 * 14. Flags(bitNEGATIVE) -> extbus1 //the NEGATIVE bit is in the external bus
+	 * 15. statusMemory <- extbus // the status memory returns the correct address according the ZERO bit
+	 * 16. PC <- extbus1 // PC stores the new address where the program is redirected to
+	 * end
+	 * @param address
+	 */
+	public void jn() {
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();// now PC points to the parameter address
+		
+		PC.read();
+		memory.read();// now the parameter value (address of the jz) is in the external bus
+		statusMemory.storeIn1(); // the address is in position 1 of the status memory
+		
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();// now PC points to the next instruction
+		
+		PC.read();//now the bus has the next istruction address
+		statusMemory.storeIn0(); //the address is in the position 0 of the status memory
+		
+		extbus1.put(Flags.getBit(1)); //the ZERO bit is in the external bus 
+		statusMemory.read(); //gets the correct address (next instruction or parameter address)
+		PC.store(); //stores into PC
 	}
 	
 	/**
@@ -970,57 +1049,88 @@ public class Architecture {
 	    PC.store(); // Armazena o endereço em PC
 	}
 	
-	/**
-	 * This method implements the microprogram for
-	 * 					jn address
-	 * In the machine language this command number is 4, and the address is in the position next to him
-	 *    
-	 * where address is a valid position in this memory architecture (where 
-	 * the PC is redirected to, but only in the case the NEGATIVE bit in Flags is 1)
-	 * The method reads the value from memory (position address) and 
-	 * inserts it into the PC register if the NEG bit in Flags register is setted.
-	 * So, the program is deviated conditionally
-	 * The logic is
-	 * 1. pc -> intbus2 //pc.read()
-	 * 2. ula <-  intbus2 //ula.store()
-	 * 3. ula incs
-	 * 4. ula -> intbus2 //ula.read()
-	 * 5. pc <- intbus2 //pc.internalstore() now pc points to the parameter
-	 * 6. pc -> extbus1 //pc.read() now the parameter address is in the extbus1
-	 * 7. Memory -> extbus1 //memory.read() the address (if jn) is in external bus 1
-	 * 8. statusMemory(1)<- extbus1 // statusMemory.storeIn1()
-	 * 9. ula incs
-	 * 10. ula -> intbus2 //ula.read()
-	 * 11. PC <- intbus2 // PC.internalStore() PC is now pointing to next instruction
-	 * 12. PC -> extbus1 // PC.read() the next instruction address is in the extbus
-	 * 13. statusMemory(0)<- extbus1 // statusMemory.storeIn0()
-	 * 14. Flags(bitNEGATIVE) -> extbus1 //the NEGATIVE bit is in the external bus
-	 * 15. statusMemory <- extbus // the status memory returns the correct address according the ZERO bit
-	 * 16. PC <- extbus1 // PC stores the new address where the program is redirected to
-	 * end
-	 * @param address
-	 */
-	public void jn() {
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();// now PC points to the parameter address
-		
-		PC.read();
-		memory.read();// now the parameter value (address of the jz) is in the external bus
-		statusMemory.storeIn1(); // the address is in position 1 of the status memory
-		
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();// now PC points to the next instruction
-		
-		PC.read();//now the bus has the next istruction address
-		statusMemory.storeIn0(); //the address is in the position 0 of the status memory
-		
-		extbus1.put(Flags.getBit(1)); //the ZERO bit is in the external bus 
-		statusMemory.read(); //gets the correct address (next instruction or parameter address)
-		PC.store(); //stores into PC
+	public void jeq() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    statusMemory.storeIn1();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    statusMemory.storeIn0();
+	    
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    extbus1.put(Flags.getBit(0));
+	    statusMemory.read();
+	    PC.store();
+	}
+	
+	public void jneq(){
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.store(0);
+
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    statusMemory.storeIn0();
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    statusMemory.storeIn1();
+	    
+	    registersInternalRead();
+	    ula.store(1);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    extbus1.put(Flags.getBit(0));
+	    statusMemory.read();
+	    PC.store();;
 	}
 
 	public void jgt(){
@@ -1070,6 +1180,69 @@ public class Architecture {
 		statusMemory.read();
 		PC.store();
 	}
+	
+	// jlw %<regA> %<regB> <mem> || se RegA<RegB então PC <- mem (desvio condicional)
+	public void jlw() {
+		
+		// PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// lê o dado de RegA
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(0);
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// Lê o dado de RegB e armazena em IR
+		PC.read();
+		memory.read();
+		IR.store();
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// JUMP 1
+		PC.read();
+		memory.read();
+		statusMemory.storeIn1();
+		
+		// "PC++"
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// JUMP 0
+		PC.read();
+		statusMemory.storeIn0();
+		
+		// Coloca o dado de RegB em ULA(1)
+		IR.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.store(1);
+		
+		// Realiza a subtração e verifica o bit negativo
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		extbus1.put(Flags.getBit(1));
+		statusMemory.read();
+		PC.store();
+			
+	}
+		
 	
 	/**
 	 * This method implements the microprogram for
@@ -1212,190 +1385,7 @@ public class Architecture {
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
-	
-	public void jeq() {
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    registersInternalRead();
-	    ula.store(0);
-	    
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    statusMemory.storeIn1();
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    statusMemory.storeIn0();
-	    
-	    registersInternalRead();
-	    ula.store(1);
-	    ula.sub();
-	    ula.internalRead(1);
-	    setStatusFlags(intbus2.get());
-	    extbus1.put(Flags.getBit(0));
-	    statusMemory.read();
-	    PC.store();
-	}
-	
-	// jlw %<regA> %<regB> <mem> || se RegA<RegB então PC <- mem (desvio condicional)
-	public void jlw() {
-		
-		// PC++
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		// lê o dado de RegA
-		PC.read();
-		memory.read();
-		demux.setValue(extbus1.get());
-		registersInternalRead();
-		ula.store(0);
-		
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		// Lê o dado de RegB e armazena em IR
-		PC.read();
-		memory.read();
-		IR.store();
-		
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		// JUMP 1
-		PC.read();
-		memory.read();
-		statusMemory.storeIn1();
-		
-		// "PC++"
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();
-		
-		// JUMP 0
-		PC.read();
-		statusMemory.storeIn0();
-		
-		// Coloca o dado de RegB em ULA(1)
-		IR.read();
-		demux.setValue(extbus1.get());
-		registersInternalRead();
-		ula.store(1);
-		
-		// Raliza a subtração e verifica o bit negativo
-		ula.sub();
-		ula.internalRead(1);
-		setStatusFlags(intbus2.get());
-		extbus1.put(Flags.getBit(1));
-		statusMemory.read();
-		PC.store();
-			
-	}
-
-	public void imulMemReg(){
-
-	}
-
-	public void imulRegMem(){
-
-	}
-
-	public void imulRegReg(){
-		
-	}
-
-	//inc %<regA>   || RegA ++
-	public void incReg(){
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    registersInternalRead();
-	    ula.store(1);
-	    ula.inc();
-	    ula.read(1);
-		setStatusFlags(intbus2.get());
-	    registersInternalStore();
-
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	}
-	
-	public void jneq(){
-	    PC.internalRead();
-	    ula.internalStore(1);
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-	    registersInternalRead();
-	    ula.store(0);
-
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    demux.setValue(extbus1.get());
-
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    memory.read();
-	    statusMemory.storeIn0();
-	    ula.inc();
-	    ula.internalRead(1);
-	    PC.internalStore();
-	    PC.read();
-	    statusMemory.storeIn1();
-	    
-	    registersInternalRead();
-	    ula.store(1);
-	    ula.sub();
-	    ula.internalRead(1);
-	    setStatusFlags(intbus2.get());
-	    extbus1.put(Flags.getBit(0));
-	    statusMemory.read();
-	    PC.store();;
-	}
+	}	
 
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
