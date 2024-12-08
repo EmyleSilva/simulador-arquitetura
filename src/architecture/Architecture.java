@@ -188,35 +188,35 @@ public class Architecture {
 	 */
 	protected void fillCommandsList() {
 		commandsList = new ArrayList<String>();
-		commandsList.add("add");         //0
-		commandsList.add("addRegReg");   //1
-		commandsList.add("addMemReg");   //2
-		commandsList.add("addRegMem");   //3
-		commandsList.add("addImmReg");   //4
-		commandsList.add("sub");         //5
-		commandsList.add("subRegReg");   //6
-		commandsList.add("subMemReg");   //7
-		commandsList.add("subRegMem");   //8
-		commandsList.add("subImmReg");   //9
-		commandsList.add("imulMemReg");  //10
-		commandsList.add("imulRegMem");  //11
-		commandsList.add("imulRegReg");  //12
-		commandsList.add("moveMemReg");  //13
-		commandsList.add("moveRegMem");  //14
-		commandsList.add("moveRegReg");  //15
-		commandsList.add("moveImmReg");  //16
-		commandsList.add("inc");  	     //17
-		commandsList.add("incReg");	     //18
-		commandsList.add("jmp");         //19
-		commandsList.add("jn");          //20
-		commandsList.add("jz");          //21
-		commandsList.add("jeq");         //22
-		commandsList.add("jneq");        //23
-		commandsList.add("jgt");         //24
-		commandsList.add("jlw");         //25
-		commandsList.add("read");        //26
-		commandsList.add("store");       //27
-		commandsList.add("ldi");         //28
+		//commandsList.add("add"); 
+		commandsList.add("addRegReg");   //0
+		commandsList.add("addMemReg");   //1
+		commandsList.add("addRegMem");   //2
+		commandsList.add("addImmReg");   //3
+		//commandsList.add("sub");         
+		commandsList.add("subRegReg");   //4
+		commandsList.add("subMemReg");   //5
+		commandsList.add("subRegMem");   //6
+		commandsList.add("subImmReg");   //7
+		commandsList.add("imulMemReg");  //8
+		commandsList.add("imulRegMem");  //9
+		commandsList.add("imulRegReg");  //10
+		commandsList.add("moveMemReg");  //11
+		commandsList.add("moveRegMem");  //12
+		commandsList.add("moveRegReg");  //13
+		commandsList.add("moveImmReg");  //14
+		//commandsList.add("inc");  	     
+		commandsList.add("inc");	   	 //15
+		commandsList.add("jmp");         //16
+		commandsList.add("jn");          //17
+		commandsList.add("jz");          //18
+		commandsList.add("jeq");         //19
+		commandsList.add("jneq");        //20
+		commandsList.add("jgt");         //21
+		commandsList.add("jlw");         //22
+		commandsList.add("read");        //23
+		commandsList.add("store");       //24
+		commandsList.add("ldi");         //25
 	}
 
 	
@@ -272,31 +272,31 @@ public class Architecture {
 	 * end
 	 * @param address
 	 */
-	public void add() {
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the parameter address
-		RPG0.internalRead();
-		ula.store(0); //the rpg value is in ULA (0). This is the first parameter
-		PC.read(); 
-		memory.read(); // the parameter is now in the external bus. 
-						//but the parameter is an address and we need the value
-		memory.read(); //now the value is in the external bus
-		IR.store();
-		IR.internalRead();
-		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter 
-		ula.add(); //the result is in the second ula's internal register
-		ula.internalRead(1);; //the operation result is in the internalbus 2
-		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
-		RPG0.internalStore(); //now the add is complete
-		PC.internalRead(); //we need to make PC points to the next instruction address
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
+	// public void add() {
+	// 	PC.internalRead();
+	// 	ula.internalStore(1);
+	// 	ula.inc();
+	// 	ula.internalRead(1);
+	// 	PC.internalStore(); //now PC points to the parameter address
+	// 	RPG0.internalRead();
+	// 	ula.store(0); //the rpg value is in ULA (0). This is the first parameter
+	// 	PC.read(); 
+	// 	memory.read(); // the parameter is now in the external bus. 
+	// 					//but the parameter is an address and we need the value
+	// 	memory.read(); //now the value is in the external bus
+	// 	IR.store();
+	// 	IR.internalRead();
+	// 	ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter 
+	// 	ula.add(); //the result is in the second ula's internal register
+	// 	ula.internalRead(1);; //the operation result is in the internalbus 2
+	// 	setStatusFlags(intbus2.get()); //changing flags due the end of the operation
+	// 	RPG0.internalStore(); //now the add is complete
+	// 	PC.internalRead(); //we need to make PC points to the next instruction address
+	// 	ula.internalStore(1);
+	// 	ula.inc();
+	// 	ula.internalRead(1);
+	// 	PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
+	// }
 	
 	//add %<regA> %<regB>    || RegB <- RegA + RegB
 	public void addRegReg() {
@@ -486,31 +486,31 @@ public class Architecture {
 	 * end
 	 * @param address
 	 */
-	public void sub() {
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the parameter address
-		RPG0.internalRead();
-		ula.store(0); //the rpg value is in ULA (0). This is the first parameter
-		PC.read(); 
-		memory.read(); // the parameter is now in the external bus. 
-						//but the parameter is an address and we need the value
-		memory.read(); //now the value is in the external bus
-		IR.store();
-		IR.internalRead();
-		ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter
-		ula.sub(); //the result is in the second ula's internal register
-		ula.internalRead(1); //the operation result is in the internalbus 2
-		setStatusFlags(intbus2.get()); //changing flags due the end of the operation
-		RPG0.internalStore(); //now the sub is complete
-		PC.internalRead(); //we need to make PC points to the next instruction address
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
+	// public void sub() {
+	// 	PC.internalRead();
+	// 	ula.internalStore(1);
+	// 	ula.inc();
+	// 	ula.internalRead(1);
+	// 	PC.internalStore(); //now PC points to the parameter address
+	// 	RPG0.internalRead();
+	// 	ula.store(0); //the rpg value is in ULA (0). This is the first parameter
+	// 	PC.read(); 
+	// 	memory.read(); // the parameter is now in the external bus. 
+	// 					//but the parameter is an address and we need the value
+	// 	memory.read(); //now the value is in the external bus
+	// 	IR.store();
+	// 	IR.internalRead();
+	// 	ula.internalStore(1); //the rpg value is in ULA (0). This is the second parameter
+	// 	ula.sub(); //the result is in the second ula's internal register
+	// 	ula.internalRead(1); //the operation result is in the internalbus 2
+	// 	setStatusFlags(intbus2.get()); //changing flags due the end of the operation
+	// 	RPG0.internalStore(); //now the sub is complete
+	// 	PC.internalRead(); //we need to make PC points to the next instruction address
+	// 	ula.internalStore(1);
+	// 	ula.inc();
+	// 	ula.internalRead(1);
+	// 	PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
+	// }
 
 	public void subRegReg() {
 		
@@ -863,19 +863,19 @@ public class Architecture {
 	 * end
 	 * @param address
 	 */
-	public void inc() {
-		RPG0.internalRead();
-		ula.store(1);
-		ula.inc();
-		ula.read(1);
-		setStatusFlags(intbus1.get());
-		RPG0.internalStore();
-		PC.internalRead(); //we need to make PC points to the next instruction address
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
-	}
+	// public void inc() {
+	// 	RPG0.internalRead();
+	// 	ula.store(1);
+	// 	ula.inc();
+	// 	ula.read(1);
+	// 	setStatusFlags(intbus1.get());
+	// 	RPG0.internalStore();
+	// 	PC.internalRead(); //we need to make PC points to the next instruction address
+	// 	ula.internalStore(1);
+	// 	ula.inc();
+	// 	ula.internalRead(1);
+	// 	PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
+	// }
 	
 	//inc %<regA>   || RegA ++
 	public void incReg(){
@@ -1469,114 +1469,110 @@ public class Architecture {
 		int command = intbus2.get();
 		simulationDecodeExecuteBefore(command);
 		switch (command) {
+		// case 0:
+		// 	add();
+		// 	break;
 		case 0:
-			add();
-			break;
-		case 1:
 			addRegReg();
 			break;
-		case 2:
+		case 1:
 			addMemReg();
 			break;
-		case 3:
+		case 2:
 			addRegMem();
 			break;
-		case 4:
+		case 3:
 			addImmReg();
 			break;
-		case 5:
+		/*case 5:
 			sub();
 			break;
-
-		case 6:
+		*/
+		case 4:
 			subRegReg();
 			break;
 		
-		case 7:
+		case 5:
 			subMemReg();
 			break;
 		
-		case 8:
+		case 6:
 			subRegMem();
 			break;
 		
-		case 9:
+		case 7:
 			subImmReg();
 			break;
 		
-		case 10:
+		case 8:
 			imulMemReg(); //Linha 1310
 			break;
 
-		case 11:
+		case 9:
 			imulRegMem(); //Linha 1314
 			break;
 
-		case 12:
+		case 10:
 			imulRegReg(); //Linha 
 			break;
 
-		case 13:
+		case 11:
 			moveMemReg();
 			break;
 
-		case 14:
+		case 12:
 			moveRegMem();
 			break;
 
-		case 15:
+		case 13:
 			moveRegReg();
 			break;
 		
-		case 16:
+		case 14:
 			moveImmReg();
 			break;
 
-		case 17:
-			inc();
+		case 15:
+			incReg(); 
 			break;
 
-		case 18:
-			incReg();
-			break;
-
-		case 19:
+		case 16:
 			jmp();
 			break;
 	
-		case 20:
+		case 17:
 			jn();
 			break;
 
-		case 21:
+		case 18:
 			jz();
 			break;
 			
-		case 22:
+		case 19:
 			jeq();
 			break;
 
-		case 23:
+		case 20:
 			jneq();
 			break;
 
-		case 24:
+		case 21:
 			jgt();
 			break;
 
-		case 25:
+		case 22:
 			jlw();
 			break;
 
-		case 26:
+		case 23:
 			read();
 			break;
 
-		case 27:
+		case 24:
 			store();
 			break;
 			
-		case 28:
+		case 25:
 			ldi();
 			break;
 

@@ -1,0 +1,4 @@
+IMUL REG MEM
+pc++
+PC -> extBus
+memory(read)

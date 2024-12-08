@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import org.hamcrest.core.IsNull;
+//import org.hamcrest.core.IsNull;
 
 import components.Register;
 
@@ -138,133 +138,148 @@ public class Assembler {
 		String parameter2 = "";
 		String parameter3 = "";
 		int commandNumber = findCommandNumber(tokens);
-		if (commandNumber == 0) { //must to proccess an add command
+	/* 	if (commandNumber == 0) { //must to proccess an add command
 			parameter = tokens[1];
 			parameter = "&"+parameter; // this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 1) { //must to proccess an addRegReg command
+	*/
+		if (commandNumber == 0) { //must to proccess an addRegReg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			System.out.println("Etrou nessa caralha");
+		}
+		if (commandNumber == 1) { //must to proccess an addMemReg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter = "&"+parameter;
+			System.out.println("Entrou nessa porra");
+		}
+		if (commandNumber == 2) { //must to proccess an addRegMem command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2;
+		}
+		if (commandNumber == 3) { //must to proccess an addImmReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 2) { //must to proccess an addMemReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 3) { //must to proccess an addRegMem command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 4) { //must to proccess an addImmReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 5) { //must to proccess an sub command
+	/*
+		if (commandNumber == 4) { //must to proccess an sub command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory		
 		}
-		if (commandNumber == 6) { //must to proccess an subRegReg command
+	*/
+		if (commandNumber == 4) { //must to proccess an subRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 7) { //must to proccess an subMemReg command
+		if (commandNumber == 5) { //must to proccess an subMemReg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter = "&"+parameter;
+		}
+		if (commandNumber == 6) { //must to proccess an subRegMem command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2;
+		}
+		if (commandNumber == 7) { //must to proccess an subImmReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 8) { //must to proccess an subRegMem command
+		if (commandNumber == 8) { //must to proccess an imulMemReg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter = "&"+parameter;
+		}
+		if (commandNumber == 9) { //must to proccess an imulRegMem command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2;
+		}
+		if (commandNumber == 10) { //must to proccess an imulRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 9) { //must to proccess an subImmReg command
+		if (commandNumber == 11) { //must to proccess an moveMemReg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter = "&"+parameter;
+		}
+		if (commandNumber == 12) { //must to proccess an moveRegMem command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2;
+		}
+		if (commandNumber == 13) { //must to proccess an moveRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 10) { //must to proccess an imulMemReg command
+		if (commandNumber == 14) { //must to proccess an moveImmReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 11) { //must to proccess an imulRegMem command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 12) { //must to proccess an imulRegReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 13) { //must to proccess an moveMemReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 14) { //must to proccess an moveRegMem command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 15) { //must to proccess an moveRegReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 16) { //must to proccess an moveImmReg command
-			parameter = tokens[1];
-			parameter2 = tokens[2];
-		}
-		if (commandNumber == 17) { //must to proccess an inc command
-			
-		}
-		if (commandNumber == 18) { //must to proccess an incReg command
+		if (commandNumber == 15) { //must to proccess an incReg command
 			parameter = tokens[1];
 		}
-		if (commandNumber == 19) { //must to proccess an jmp command
+		if (commandNumber == 16) { //must to proccess an jmp command
 			parameter = tokens[1];
 			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 20) { //must to proccess an jn command
+		if (commandNumber == 17) { //must to proccess an jn command
 			parameter = tokens[1];
 			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 21) { //must to proccess an jz command
+		if (commandNumber == 18) { //must to proccess an jz command
 			parameter = tokens[1];
 			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 22) { //must to proccess an jeq command
+		if (commandNumber == 19) { //must to proccess an jeq command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 23) { //must to proccess an jneq command
+		if (commandNumber == 20) { //must to proccess an jneq command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 24) { //must to proccess an jgt command
+		if (commandNumber == 21) { //must to proccess an jgt command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 25) { //must to proccess an jlw command
+		if (commandNumber == 22) { //must to proccess an jlw command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 26) { //must to proccess an read command
+		if (commandNumber == 23) { //must to proccess an read command
 			parameter = tokens[1];
 			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 27) { //must to proccess an store command
+		if (commandNumber == 24) { //must to proccess an store command
 			parameter = tokens[1];
 			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 28) { //must to proccess an ldi command
+		if (commandNumber == 25) { //must to proccess an ldi command
 			parameter = tokens[1];
 		}
+		System.out.println("PORRA " + commandNumber);
 		objProgram.add(Integer.toString(commandNumber));
+		System.out.println("PORRA " + objProgram.get(0));
 		if (!parameter.isEmpty()) {
 			objProgram.add(parameter);
 		}
 		if (!parameter2.isEmpty()) {
 			objProgram.add(parameter2);
+		}
+		if (!parameter3.isEmpty()){
+			objProgram.add(parameter3);
 		}
 	}
 
@@ -304,13 +319,13 @@ public class Assembler {
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { //this is a moveRegReg comand
 			p = commands.indexOf("moveRegReg");
 		}
-		else if ((p1.startsWith("%"))&&(p2.startsWith("[A-Za-z]+"))) { //this is a moveRegMem comand
+		else if ((p1.startsWith("%"))&&(p2.matches("^[A-Za-z].*"))) { //this is a moveRegMem comand
 			p = commands.indexOf("moveRegMem");
 		}
-		else if ((p1.startsWith("[A-Za-z]+"))&&(p2.startsWith("%"))) { //this is a moveMemReg comand
+		else if ((p1.matches("^[A-Za-z].*"))&&(p2.startsWith("%"))) { //this is a moveMemReg comand
 			p = commands.indexOf("moveMemReg");
 		}
-		else if ((p1.startsWith("[-]*[0-9]+"))&&(p2.startsWith("%"))) { //this is a moveImmReg comand
+		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { //this is a moveImmReg comand
 			p = commands.indexOf("moveImmReg");
 		}
 		return p;
@@ -328,16 +343,21 @@ public class Assembler {
 		int p=-1;
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { // this is a addRegReg comand
 			p = commands.indexOf("addRegReg");
+			//System.out.println(p);
 		}
-		else if ((p1.startsWith("%"))&&(p2.startsWith("[A-Za-z]+"))) { // this is a addRegMem comand
+		else if ((p1.startsWith("%"))&&(p2.matches("^[A-Za-z].*"))) { // this is a addRegMem comand
 			p = commands.indexOf("addRegMem");
+			//System.out.println(p);
 		}
-		else if ((p1.startsWith("[A-Za-z]+"))&&(p2.startsWith("%"))) { // this is a addMemReg comand
+		else if ((p1.matches("^[A-Za-z].*"))&&(p2.startsWith("%"))) { // this is a addMemReg comand
 			p = commands.indexOf("addMemReg");
+			//System.out.println(p);
 		}
-		else if ((p1.startsWith("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a moveRegReg comand
+		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a moveRegReg comand
 			p = commands.indexOf("addImmReg");
+			//System.out.println(p);
 		}
+		System.out.println(p);
 		return p;
 	}
 
@@ -354,13 +374,13 @@ public class Assembler {
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { // this is a subRegReg comand
 			p = commands.indexOf("subRegReg");
 		}
-		else if ((p1.startsWith("[A-Za-z]+"))&&(p2.startsWith("%"))) { // this is a subMemReg comand
+		else if ((p1.matches("^[A-Za-z].*"))&&(p2.startsWith("%"))) { // this is a subMemReg comand
 			p = commands.indexOf("subMemReg");
 		}
-		else if ((p1.startsWith("%"))&&(p2.startsWith("[A-Za-z]+"))) { // this is a subRegMem comand
+		else if ((p1.startsWith("%"))&&(p2.matches("^[A-Za-z].*"))) { // this is a subRegMem comand
 			p = commands.indexOf("subRegMem");
 		}
-		else if ((p1.startsWith("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a subImmReg comand
+		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a subImmReg comand
 			p = commands.indexOf("subImmReg");
 		}
 		return p;
@@ -376,16 +396,16 @@ public class Assembler {
 		String p1 = tokens[1];
 		String p2 = tokens[2];
 		int p=-1;
-		if ((p1.startsWith("[A-Za-z]+"))&&(p2.startsWith("%"))) { // this is a imulMemReg comand
+		if ((p1.matches("^[A-Za-z].*"))&&(p2.startsWith("%"))) { // this is a imulMemReg comand
 			p = commands.indexOf("imulMemReg");
 		}
-		else if ((p1.startsWith("%"))&&(p2.startsWith("[A-Za-z]+"))) { // this is a imulRegMem comand
+		else if ((p1.startsWith("%"))&&(p2.matches("^[A-Za-z].*"))) { // this is a imulRegMem comand
 			p = commands.indexOf("imulRegMem");
 		}
 		else if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { // this is a imulRegReg comand
 			p = commands.indexOf("imulRegReg");
 		}
-		else if ((p1.startsWith("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a subImmReg comand
+		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a subImmReg comand
 			p = commands.indexOf("imulImmReg");
 		}
 		return p;
