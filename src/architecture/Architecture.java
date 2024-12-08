@@ -188,12 +188,12 @@ public class Architecture {
 	 */
 	protected void fillCommandsList() {
 		commandsList = new ArrayList<String>();
-		//commandsList.add("add"); 
+		//commandsList.add("add");            
 		commandsList.add("addRegReg");   //0
 		commandsList.add("addMemReg");   //1
 		commandsList.add("addRegMem");   //2
 		commandsList.add("addImmReg");   //3
-		//commandsList.add("sub");         
+		//commandsList.add("sub");            
 		commandsList.add("subRegReg");   //4
 		commandsList.add("subMemReg");   //5
 		commandsList.add("subRegMem");   //6
@@ -205,8 +205,8 @@ public class Architecture {
 		commandsList.add("moveRegMem");  //12
 		commandsList.add("moveRegReg");  //13
 		commandsList.add("moveImmReg");  //14
-		//commandsList.add("inc");  	     
-		commandsList.add("inc");	   	 //15
+		//commandsList.add("inc");  	       
+		commandsList.add("inc");	   	   //15
 		commandsList.add("jmp");         //16
 		commandsList.add("jn");          //17
 		commandsList.add("jz");          //18

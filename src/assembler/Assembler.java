@@ -146,13 +146,11 @@ public class Assembler {
 		if (commandNumber == 0) { //must to proccess an addRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
-			System.out.println("Etrou nessa caralha");
 		}
 		if (commandNumber == 1) { //must to proccess an addMemReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter = "&"+parameter;
-			System.out.println("Entrou nessa porra");
 		}
 		if (commandNumber == 2) { //must to proccess an addRegMem command
 			parameter = tokens[1];
@@ -269,9 +267,7 @@ public class Assembler {
 		if (commandNumber == 25) { //must to proccess an ldi command
 			parameter = tokens[1];
 		}
-		System.out.println("PORRA " + commandNumber);
 		objProgram.add(Integer.toString(commandNumber));
-		System.out.println("PORRA " + objProgram.get(0));
 		if (!parameter.isEmpty()) {
 			objProgram.add(parameter);
 		}
@@ -343,19 +339,15 @@ public class Assembler {
 		int p=-1;
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { // this is a addRegReg comand
 			p = commands.indexOf("addRegReg");
-			//System.out.println(p);
 		}
 		else if ((p1.startsWith("%"))&&(p2.matches("^[A-Za-z].*"))) { // this is a addRegMem comand
 			p = commands.indexOf("addRegMem");
-			//System.out.println(p);
 		}
 		else if ((p1.matches("^[A-Za-z].*"))&&(p2.startsWith("%"))) { // this is a addMemReg comand
 			p = commands.indexOf("addMemReg");
-			//System.out.println(p);
 		}
 		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a moveRegReg comand
 			p = commands.indexOf("addImmReg");
-			//System.out.println(p);
 		}
 		System.out.println(p);
 		return p;

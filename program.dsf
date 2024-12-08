@@ -3,7 +3,7 @@ b
 c
 t
 ldi 1
-move %RPG0 %RPG1
+imul %RPG0 %RPG1
 store a
 ldi 3
 store b
