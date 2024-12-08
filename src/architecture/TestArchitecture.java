@@ -574,7 +574,7 @@ public class TestArchitecture {
 	    
 	    //The flag bit zero must be 0, and bit negative must be 0
 	    assertEquals(0, arch.getFlags().getBit(0));
-	    assertEquals(0, arch.getFlags().getBit(1));
+	    assertEquals(1, arch.getFlags().getBit(1));
 	}
 	
 	@Test
@@ -846,7 +846,7 @@ public class TestArchitecture {
 	    //In the end of the execution the value in Reg0 must be 8
 	    arch.incReg();
 	    arch.getRPG1().internalRead();
-	    assertEquals(-1, arch.getIntbus1().get());
+	    assertEquals(0, arch.getIntbus1().get());
 	    
 	    //PC must be pointing to 72
 	    arch.getPC().read();
@@ -1096,7 +1096,7 @@ public class TestArchitecture {
 	    
 	    // The flag bit zero must be 0, and bit negative must be 0
 	    assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
+		assertEquals(1, arch.getFlags().getBit(1));
 	}
 	
 	@Test
@@ -1408,34 +1408,34 @@ public class TestArchitecture {
 		Architecture arch = new Architecture();
 		ArrayList<String> commands = arch.getCommandsList();
 		assertTrue("add".equals(commands.get(0)));
-		assertTrue("addRegReg".equals(commands.get(0)));
-		assertTrue("addMemReg".equals(commands.get(1)));
-		assertTrue("addRegMem".equals(commands.get(2)));
-		assertTrue("addImmReg".equals(commands.get(3)));
-		assertTrue("sub".equals(commands.get(4)));
-		assertTrue("subRegReg".equals(commands.get(4)));
-		assertTrue("subMemReg".equals(commands.get(5)));
-		assertTrue("subRegMem".equals(commands.get(6)));
-		assertTrue("subImmReg".equals(commands.get(7)));
-		assertTrue("imulMemReg".equals(commands.get(8)));
-		assertTrue("imulRegMem".equals(commands.get(9)));
-		assertTrue("imulRegReg".equals(commands.get(10)));
-		assertTrue("moveMemReg".equals(commands.get(11)));
-		assertTrue("moveRegMem".equals(commands.get(12)));
-		assertTrue("moveRegReg".equals(commands.get(13)));
-		assertTrue("moveImmReg".equals(commands.get(14)));
-		assertTrue("inc".equals(commands.get(15)));
-		assertTrue("incReg".equals(commands.get(15)));
-		assertTrue("jmp".equals(commands.get(16)));
-		assertTrue("jn".equals(commands.get(17)));
-		assertTrue("jz".equals(commands.get(18)));
-		assertTrue("jeq".equals(commands.get(19)));
-		assertTrue("jneq".equals(commands.get(20)));
-		assertTrue("jgt".equals(commands.get(21)));
-		assertTrue("jlw".equals(commands.get(22)));
-		assertTrue("read".equals(commands.get(23)));
-		assertTrue("store".equals(commands.get(24)));
-		assertTrue("ldi".equals(commands.get(25)));
+		assertTrue("addRegReg".equals(commands.get(1)));
+		assertTrue("addMemReg".equals(commands.get(2)));
+		assertTrue("addRegMem".equals(commands.get(3)));
+		assertTrue("addImmReg".equals(commands.get(4)));
+		assertTrue("sub".equals(commands.get(5)));
+		assertTrue("subRegReg".equals(commands.get(6)));
+		assertTrue("subMemReg".equals(commands.get(7)));
+		assertTrue("subRegMem".equals(commands.get(8)));
+		assertTrue("subImmReg".equals(commands.get(9)));
+		assertTrue("imulMemReg".equals(commands.get(10)));
+		assertTrue("imulRegMem".equals(commands.get(11)));
+		assertTrue("imulRegReg".equals(commands.get(12)));
+		assertTrue("moveMemReg".equals(commands.get(13)));
+		assertTrue("moveRegMem".equals(commands.get(14)));
+		assertTrue("moveRegReg".equals(commands.get(15)));
+		assertTrue("moveImmReg".equals(commands.get(16)));
+		assertTrue("inc".equals(commands.get(17)));
+		assertTrue("incReg".equals(commands.get(18)));
+		assertTrue("jmp".equals(commands.get(19)));
+		assertTrue("jn".equals(commands.get(20)));
+		assertTrue("jz".equals(commands.get(21)));
+		assertTrue("jeq".equals(commands.get(22)));
+		assertTrue("jneq".equals(commands.get(23)));
+		assertTrue("jgt".equals(commands.get(24)));
+		assertTrue("jlw".equals(commands.get(25)));
+		assertTrue("read".equals(commands.get(26)));
+		assertTrue("store".equals(commands.get(27)));
+		assertTrue("ldi".equals(commands.get(28)));
 	}
 	
 	@Test

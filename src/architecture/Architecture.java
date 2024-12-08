@@ -669,7 +669,7 @@ public class Architecture {
 	}
 
 	public void imulMemReg(){
-
+		
 	}
 
 	public void imulRegMem(){
