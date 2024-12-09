@@ -106,7 +106,18 @@ public class Architecture {
 	}
 
 	//getters
+	public ArrayList<Register> getStack(){
+		ArrayList<Register> stack = new ArrayList<>();
+		stack.add(stkTop);
+		stack.add(stkBot);
+		return stack;
+	}
+
 	
+	public Bus getExtbus() {
+		return extbus1;
+	}
+
 	protected Bus getExtbus1() {
 		return extbus1;
 	}
@@ -677,7 +688,119 @@ public class Architecture {
 	}
 
 	public void imulRegReg(){
+		/**
+		 * Guarda os valores dos RPGS na memoria
+		 */
 		
+		//Coloca stktop na ula
+		stkTop.read();
+		IR.store();
+		IR.internalRead();
+		ula.internalStore(0);
+
+		//Guarda o valor de RPG0 na memoria
+		RPG0.read();
+		IR.internalStore();
+		memory.store();
+		IR.read();
+		memory.store();
+		
+		//Adiciona 1 a ULA para realizar decrementos
+		extbus1.put(1); 
+		IR.store();
+		IR.internalRead();
+
+		//Decrementa stkTop
+		ula.internalStore(1);
+		ula.sub();
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+
+		//Guardar RPG1
+		memory.store();
+		RPG1.read();
+		IR.internalStore();
+		IR.read();
+		memory.store();
+
+		//Decrementa stkTop
+		ula.sub();
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+		
+		//Guarda RPG2
+		memory.store();
+		RPG2.read();
+		IR.internalStore();
+		IR.read();
+		memory.store();
+
+		//decrementa stkTop
+		ula.sub();
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+		memory.store();
+		
+		//Guarda o valor de RPG3 na memoria
+		RPG3.read();
+		IR.internalStore();
+		memory.store();
+		IR.read();
+		memory.store();
+
+		ula.internalRead(1);
+		IR.internalStore();
+		IR.read();
+		stkTop.store();
+
+		/**
+		 * Inicia o IMUL
+		 */
+		
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); // Agora PC aponta para o primeiro parametro
+
+		//armazena o primeiro parametro no RPG0
+		PC.read();
+		memory.read();
+		IR.store();
+		demux.setValue(extbus1.get());
+		registersRead();
+		RPG0.internalStore();
+
+		//segundo paramentro 
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		//armazena o segundo parametro no RPG1
+		PC.read();
+		memory.read();
+		IR.store();
+		demux.setValue(extbus1.get());
+		registersRead();
+		RPG1.internalStore();
+
+		/**
+		 * MOVES
+		 * ADD 
+		 */
+		
+
+		//inicia a soma, RPG2 armazena o resultado;
+		
+		RPG2.internalRead();
+		ula.read(1);
+		RPG0.internalRead();
+		ula.read(0);
+
+		ula.add();
 	}
 
 	public void moveMemReg() {
@@ -1431,18 +1554,18 @@ public class Architecture {
 	 * @throws IOException 
 	 */
 	public void readExec(String filename) throws IOException {
-		   BufferedReader br = new BufferedReader(new		 
-		   FileReader(filename+".dxf"));
-		   String linha;
-		   int i=0;
-		   while ((linha = br.readLine()) != null) {
-			     extbus1.put(i);
-			     memory.store();
-			   	 extbus1.put(Integer.parseInt(linha));
-			     memory.store();
-			     i++;
-			}
-			br.close();
+		BufferedReader br = new BufferedReader(new		 
+		FileReader(filename+".dxf"));
+		String linha;
+		int i=0;
+		while ((linha = br.readLine()) != null) {
+			extbus1.put(i);
+			memory.store();
+			extbus1.put(Integer.parseInt(linha));
+			memory.store();
+			i++;
+		}
+		br.close();
 	}
 	
 	/**

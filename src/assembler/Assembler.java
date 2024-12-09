@@ -349,7 +349,6 @@ public class Assembler {
 		else if ((p1.matches("[-]*[0-9]+"))&&(p2.startsWith("%"))) { // this is a moveRegReg comand
 			p = commands.indexOf("addImmReg");
 		}
-		System.out.println(p);
 		return p;
 	}
 
@@ -455,6 +454,10 @@ public class Assembler {
 			replaceVariable(var, position);
 			position --;
 		}
+		ArrayList<Register> stack = arch.getStack();
+		arch.getExtbus().put(position);
+		stack.get(0).store();
+		stack.get(1).store();
 	}
 
 	/**
