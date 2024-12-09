@@ -1,0 +1,32 @@
+ano1
+ano2
+ano3
+idade
+ldi 2000
+move %RPG0 ano1
+ldi 1998
+move %RPG0 ano2
+ldi 1997
+move %RPG0 ano3
+ldi 2003
+move %RPG0 %RPG1
+move 19 %RPG3
+inc %RPG1
+move 2024 %RPG2
+laco1:
+sub %RPG2 ano1
+read ano1
+move %RPG0 idade
+read ano2
+move %RPG0 ano1
+read ano3
+move %RPG0 ano2
+move idade %RPG0
+jlw %RPG3 %RPG0 laco2
+jmp laco3
+laco2:
+add %RPG0 %RPG3
+jmp laco1
+laco3:
+add idade %RPG3
+sub %RPG1 %RPG2
