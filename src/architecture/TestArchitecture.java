@@ -475,7 +475,10 @@ public class TestArchitecture {
 	@Test
 	public void testSubRegReg() {
 		Architecture arch = new Architecture();
-		
+		/**
+		 * SUB REG0 REG1
+		 * SUB 20   5
+		 */
 		// Stores the number 0 in the position 10 of the memory
 		arch.getMemory().getDataList()[10] = 0;
 		// Stores the number 1 in the position 11 of the memory
@@ -530,6 +533,124 @@ public class TestArchitecture {
 		// The flag bit zero must be 0, and bit negative must be 0
 	    assertEquals(0, arch.getFlags().getBit(0));
 	    assertEquals(0, arch.getFlags().getBit(1));
+
+		/**
+		 * SUB REG 0 REG 1
+		 * SUB 20 20
+		 */
+		// Stores the number 0 in the position 10 of the memory
+		arch.getMemory().getDataList()[10] = 0;
+		// Stores the number 1 in the position 11 of the memory
+		arch.getMemory().getDataList()[11] = 1;
+		
+		// Stores the value 20 into the Register 0
+		arch.getIntbus1().put(20);
+		arch.getRPG0().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+		
+		// Stores the value 20 into the Register 1
+		arch.getIntbus1().put(20);
+		arch.getRPG1().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+		// Making PC points to position 9
+		arch.getExtbus1().put(9);
+		arch.getPC().store();
+		
+		// Executing the command sub Reg0 Reg1.
+		arch.subRegReg();
+		
+		// Clears the external bus
+	    arch.getExtbus1().put(0);
+		
+		// The value stored into the position 10 of the memory must be 0
+	    arch.getExtbus1().put(10);
+	    arch.getMemory().read();
+	    assertEquals(0, arch.getExtbus1().get());
+		
+	    // The value stored into the position 11 of the memory must be 1
+	    arch.getExtbus1().put(11);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+		
+		// The value stored into the Register 0 must be 20
+		arch.getRegistersList().get(0).internalRead();
+		assertEquals(20, arch.getIntbus1().get());
+		
+		// The value stored into the Register 1 must be 20
+	    arch.getRegistersList().get(1).internalRead();
+	    assertEquals(0, arch.getIntbus1().get());
+		
+		// Testing if PC points to 3 positions after the original
+		// PC was pointing to 9; now it must be pointing to 12
+		arch.getPC().read();assertEquals(12, arch.getExtbus1().get());
+		
+		// The flag bit zero must be 1, and bit negative must be 0
+	    assertEquals(1, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
+	    
+	    /**
+		 * SUB REG 0 REG 1
+		 * SUB 5 20
+		 */
+		// Stores the number 0 in the position 10 of the memory
+		arch.getMemory().getDataList()[10] = 0;
+		// Stores the number 1 in the position 11 of the memory
+		arch.getMemory().getDataList()[11] = 1;
+		
+		// Stores the value 5 into the Register 0
+		arch.getIntbus1().put(5);
+		arch.getRPG0().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+		
+		// Stores the value 20 into the Register 1
+		arch.getIntbus1().put(20);
+		arch.getRPG1().internalStore();
+		
+		// Clears the internal bus 1
+	    arch.getIntbus1().put(0);
+	    
+		// Making PC points to position 9
+		arch.getExtbus1().put(9);
+		arch.getPC().store();
+		
+		// Executing the command sub Reg0 Reg1.
+		arch.subRegReg();
+		
+		// Clears the external bus
+	    arch.getExtbus1().put(0);
+		
+		// The value stored into the position 10 of the memory must be 0
+	    arch.getExtbus1().put(10);
+	    arch.getMemory().read();
+	    assertEquals(0, arch.getExtbus1().get());
+		
+	    // The value stored into the position 11 of the memory must be 1
+	    arch.getExtbus1().put(11);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+		
+		// The value stored into the Register 0 must be 5
+		arch.getRegistersList().get(0).internalRead();
+		assertEquals(5, arch.getIntbus1().get());
+		
+		// The value stored into the Register 1 must be -15
+	    arch.getRegistersList().get(1).internalRead();
+	    assertEquals(-15, arch.getIntbus1().get());
+		
+		// Testing if PC points to 3 positions after the original
+		// PC was pointing to 9; now it must be pointing to 12
+		arch.getPC().read();assertEquals(12, arch.getExtbus1().get());
+		
+		// The flag bit zero must be 0, and bit negative must be 1
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(1, arch.getFlags().getBit(1));
 	}
 	
 	@Test
