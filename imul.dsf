@@ -1,0 +1,8 @@
+var 
+caralho
+ldi 2
+move %RPG0 var
+ldi 5
+move %RPG0 %RPG2
+imul %RPG2 var
+move %RPG2 caralho

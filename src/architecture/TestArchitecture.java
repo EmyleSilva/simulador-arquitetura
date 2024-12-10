@@ -244,6 +244,64 @@ public class TestArchitecture {
 	    assertEquals(0, arch.getFlags().getBit(0));
 	    assertEquals(0, arch.getFlags().getBit(1));
 	}
+
+	@Test
+	public void testImulRegMem(){
+		Architecture arch = new Architecture();
+		/**
+		 * Multiplicaremos 5 * 2 
+		 * Usando:
+		 * Reg2 = 5
+		 * Mem (posicao 30) = 2
+		 * 
+		 * No final, Reg2 = 5  e Mem (posicao 30) = 10
+		 */
+		arch.getMemory().getDataList()[29] = 2; //ID do Reg2 
+		arch.getMemory().getDataList()[30] = 2; //Valor armazenado na mem
+
+		//PC aponta para 28
+		arch.getExtbus1().put(28);
+		arch.getPC().store();
+		//Limpa o extBus
+		arch.getExtbus1().put(0);
+
+		//Setamos RPG2 com o valor 5
+		arch.getIntbus2().put(5);
+		arch.getRPG2().store();
+		//Limpa o bus
+		arch.getIntbus2().put(0);
+
+		//Executamos o programa
+		arch.imulRegMem();
+
+		//No fim, PC deve ser igual a 31
+		arch.getPC().read();
+		assertEquals(31, arch.getExtbus1().get());
+
+		//Na memoria, a posicao 29 deve ser igual a 2 
+		// e a posição 30 deve ser 10
+		arch.getExtbus1().put(29);
+		arch.getMemory().read();
+		assertEquals(2, arch.getExtbus1().get());
+
+		arch.getExtbus1().put(30);
+		arch.getMemory().read();
+		assertEquals(10, arch.getExtbus1().get());
+
+		//Agora, verificamos os RPGS, todos exceto o 2 devem ser 0
+		//RPG2 deve ser 5
+		arch.getRPG0().read();
+		assertEquals(0, arch.getIntbus2().get());
+
+		arch.getRPG1().read();
+		assertEquals(0, arch.getIntbus2().get());
+
+		arch.getRPG3().read();
+		assertEquals(0, arch.getIntbus2().get());
+
+		arch.getRPG2().read();
+		assertEquals(2, arch.getIntbus2().get());
+	}
 	
 	@Test
 	public void testaddImmReg() {

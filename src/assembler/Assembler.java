@@ -445,19 +445,17 @@ public class Assembler {
 
 	/**
 	 * This method replaces all variables by their addresses.
-	 * The addresses o0f the variables startes in the end of the memory
+	 * The addresses of the variables startes in the end of the memory
 	 * and decreases (creating a stack)
 	 */
 	protected void replaceAllVariables() {
-		int position = arch.getMemorySize()-1; //starting from the end of the memory
+		int position = arch.getMemorySize()-48; //starting from the end of the memory
 		for (String var : this.variables) { //scanning all variables
 			replaceVariable(var, position);
 			position --;
 		}
-		ArrayList<Register> stack = arch.getStack();
-		arch.getExtbus().put(position);
-		stack.get(0).store();
-		stack.get(1).store();
+		System.out.println("Position: "+position);
+		this.arch.setStack(position); //Inicializa os RPGs de pilha
 	}
 
 	/**
