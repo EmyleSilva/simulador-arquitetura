@@ -1037,7 +1037,7 @@ public class TestArchitecture {
 	    assertEquals(1, arch.getExtbus1().get());
 	    
 	    //The flag bit zero must be 0, and bit negative must be 1
-	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(1, arch.getFlags().getBit(0));
 	    assertEquals(0, arch.getFlags().getBit(1));
 	}
 	

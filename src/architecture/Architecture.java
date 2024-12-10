@@ -336,7 +336,7 @@ public class Architecture {
 	    // Realiza a soma
 	    ula.add();
 	    ula.read(1); // Resultado é colocado no intbus2
-		setStatusFlags(intbus2.get());
+		setStatusFlags(intbus1.get());
 
 	    // Atualiza o demux para apontar para regB (onde o resultado será armazenado)
 	    demux.setValue(extbus1.get()); // Seleciona regB
@@ -373,7 +373,7 @@ public class Architecture {
 		ula.internalStore(0);
 		ula.add();
 		ula.read(1);
-		setStatusFlags(intbus2.get());
+		setStatusFlags(intbus1.get());
 		registersInternalStore();
 		
 		PC.internalRead();
@@ -409,6 +409,7 @@ public class Architecture {
 	    
 	    ula.add();
 	    ula.internalRead(1);
+		setStatusFlags(intbus2.get());
 	    IR.internalStore();
 	    PC.read();
 	    memory.read();
@@ -446,7 +447,7 @@ public class Architecture {
 		ula.internalStore(0);
 		ula.add();
 		ula.read(1);
-		setStatusFlags(intbus2.get());
+		setStatusFlags(intbus1.get());
 		registersInternalStore();
 		
 		PC.internalRead();
@@ -1259,7 +1260,7 @@ public class Architecture {
 	    ula.store(1);
 	    ula.inc();
 	    ula.read(1);
-		setStatusFlags(intbus2.get());
+		setStatusFlags(intbus1.get());
 	    registersInternalStore();
 
 	    PC.internalRead();
