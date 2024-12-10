@@ -1,8 +1,11 @@
-var 
-caralho
-ldi 2
-move %RPG0 var
-ldi 5
+var1 
+var2
+ldi 10
+move %RPG0 var1
+ldi 9
 move %RPG0 %RPG2
-imul %RPG2 var
-move %RPG2 caralho
+inc %RPG1 
+move %RPG0 %RPG3
+inc %RPG3
+imul %RPG2 var1
+move %RPG2 var2
