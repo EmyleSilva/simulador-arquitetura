@@ -62,7 +62,7 @@ public class Architecture {
 		fillRegistersList();
 		ula = new Ula(intbus1, intbus2);
 		statusMemory = new Memory(2, extbus1);
-		memorySize = 128;
+		memorySize = 401;
 		memory = new Memory(memorySize, extbus1);
 		demux = new Demux(); // this bus is used only for multiple register operations
 		
@@ -676,13 +676,21 @@ public class Architecture {
 	}
 
 	public void imulMemReg(){
+		//PC++
+		//Primeiro parâmetro
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
 		
 	}
 	
 	public void imulRegMem(){
-		/**
+		/*
 		 * PC++ para conseguir o primeiro param
-		 */
+		*/
 		PC.internalRead();
 		ula.internalStore(1);
 		ula.inc();
@@ -690,7 +698,7 @@ public class Architecture {
 		PC.internalStore();
 
 		//Guardamos PC na memoria
-		extbus1.put(81);
+		extbus1.put(301);
 		memory.store();
 		PC.read();
 		memory.store();
@@ -698,28 +706,28 @@ public class Architecture {
 		//Guardamos os RPGs
 		RPG0.read();
 		IR.internalStore();
-		extbus1.put(82);
+		extbus1.put(302);
 		memory.store();
 		IR.read();
 		memory.store();
 		
 		RPG1.read();
 		IR.internalStore();
-		extbus1.put(83);
+		extbus1.put(303);
 		memory.store();
 		IR.read();
 		memory.store();
 
 		RPG2.read();
 		IR.internalStore();
-		extbus1.put(84);
+		extbus1.put(304);
 		memory.store();
 		IR.read();
 		memory.store();
 
 		RPG3.read();
 		IR.internalStore();
-		extbus1.put(85);
+		extbus1.put(305);
 		memory.store();
 		IR.read();
 		memory.store();
@@ -727,8 +735,8 @@ public class Architecture {
 		/**
 		 * Move RegA Reg0 (upcode: 13)
 		 */
-		//armazena o upcode do Move
-		extbus1.put(86);
+		//Armazena o upcode do Move
+		extbus1.put(306);
 		memory.store();
 		extbus1.put(13);
 		memory.store();
@@ -737,12 +745,12 @@ public class Architecture {
 		memory.read();
 		IR.store();		
 		//Guardamos na memoria o ID do RegA
-		extbus1.put(87);
+		extbus1.put(307);
 		memory.store();
 		IR.read();
 		memory.store();
 		//Poe o Reg0 na memoria
-		extbus1.put(88);
+		extbus1.put(308);
 		memory.store();
 		extbus1.put(0);
 		memory.store();
@@ -752,17 +760,17 @@ public class Architecture {
 		 * REG
 			*/
 		//Colocamos o upcode de MoveImmReg na memoria
-		extbus1.put(89);
+		extbus1.put(309);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
 		//Colocamos 0 na proxima posição
-		extbus1.put(90);
+		extbus1.put(310);
 		memory.store();
 		extbus1.put(0);
 		memory.store();
 		//Colocamos o ID do Reg1 na proxima posição
-		extbus1.put(91);
+		extbus1.put(311);
 		memory.store();
 		extbus1.put(1);
 		memory.store();
@@ -780,20 +788,20 @@ public class Architecture {
 		 * MoveMemReg (11) para guarduar o valor do param em REG3
 		 */
 		//Upcode da instrução na mem
-		extbus1.put(92);
+		extbus1.put(312);
 		memory.store();
 		extbus1.put(11);
 		memory.store();
-		//Valor do primeiro param
+		//Valor do primeiro parâmetro
 		PC.read();
 		memory.read();
 		IR.store();
-		extbus1.put(93);
+		extbus1.put(313);
 		memory.store();
 		IR.read();
 		memory.store();
-		//Valor do segundo param (REG3)
-		extbus1.put(94);
+		//Valor do segundo parâmetro (REG3)
+		extbus1.put(314);
 		memory.store();
 		extbus1.put(3);
 		memory.store();
@@ -802,17 +810,17 @@ public class Architecture {
 		 * Realizamos o ADD Reg0 Reg1 (Onde o loop começa)
 		 */
 		//Colocamos o upcode de AddRegReg(0) na memoria
-		extbus1.put(95);
+		extbus1.put(315);
 		memory.store();
 		extbus1.put(0);
 		memory.store();
 		//Colocamos o primeiro parametro na memoria
-		extbus1.put(96);
+		extbus1.put(316);
 		memory.store();
 		extbus1.put(0);
 		memory.store();
 		//Colocamos o segundo paramentro na memoria
-		extbus1.put(97);
+		extbus1.put(317);
 		memory.store();
 		extbus1.put(1);
 		memory.store();
@@ -821,17 +829,17 @@ public class Architecture {
 		 * Move Imm Reg2 (Movemos 1 para o Reg2)
 		 */
 		//Upcode do moveImmReg
-		extbus1.put(98);
+		extbus1.put(318);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
-		//Primeiro parametro
-		extbus1.put(99);
+		//Primeiro Parâmetro
+		extbus1.put(319);
 		memory.store();
 		extbus1.put(1);
 		memory.store();
-		//Segundo parametro
-		extbus1.put(100);
+		//Segundo Parâmetro
+		extbus1.put(320);
 		memory.store();
 		extbus1.put(2);
 		memory.store();
@@ -840,17 +848,17 @@ public class Architecture {
 		 * SUB Reg3 Reg2
 		 */
 		//Upcode do sub na mem
-		extbus1.put(101);
+		extbus1.put(321);
 		memory.store();
 		extbus1.put(4);
 		memory.store();
 		//Guarda o ID do reg3
-		extbus1.put(102);
+		extbus1.put(322);
 		memory.store();
 		extbus1.put(3);
 		memory.store();
 		//Guarda o ID do reg2
-		extbus1.put(103);
+		extbus1.put(323);
 		memory.store();
 		extbus1.put(2);
 		memory.store();
@@ -859,17 +867,17 @@ public class Architecture {
 		 * Fazemos um Move Reg2Reg3 para guardar o resultado da subtração no local correto 
 		 */
 		//Upcode do moveRegReg (13)
-		extbus1.put(104);
+		extbus1.put(324);
 		memory.store();
 		extbus1.put(13);
 		memory.store();
-		//Primeiro param
-		extbus1.put(105);
+		//Primeiro parâmetro
+		extbus1.put(325);
 		memory.store();
 		extbus1.put(2);
 		memory.store();
-		//Segundo param
-		extbus1.put(106);
+		//Segundo parâmetro
+		extbus1.put(326);
 		memory.store();
 		extbus1.put(3);
 		memory.store();
@@ -878,134 +886,134 @@ public class Architecture {
 		 * JZ MoveRegMem
 		 */
 		//Upcode jz (18) na mem
-		extbus1.put(107);
+		extbus1.put(327);
 		memory.store();
 		extbus1.put(18);
 		memory.store();
 		//Apontar para o endereço do Upcode moveRegMem
-		extbus1.put(108);
+		extbus1.put(328);
 		memory.store();
-		extbus1.put(111); 
+		extbus1.put(331); 
 		memory.store();
 
 		/**
 		 * JMP ADD (retorna pro laço, caso o segundo param > 0)
 		 */
 		//Guarda o Upcode do jmp (16)
-		extbus1.put(109);
+		extbus1.put(329);
 		memory.store();
 		extbus1.put(16);
 		memory.store();
 		//Guarda o endereço do add na memória (inicio do laco)
-		extbus1.put(110);
+		extbus1.put(330);
 		memory.store();
-		extbus1.put(95);
+		extbus1.put(315);
 		memory.store();
 		
 		/**
 		 * MoveRegMem (Após a multiplicação, guarda o resultado na memória)
 		 */
 		//Upcode do moveRegMem (12)
-		extbus1.put(111);
+		extbus1.put(331);
 		memory.store();
 		extbus1.put(12);
 		memory.store();
-		//Primeiro Param (Reg 1)
-		extbus1.put(112);
+		//Primeiro Parâmetro (Reg 1)
+		extbus1.put(332);
 		memory.store();
 		extbus1.put(1);
 		memory.store();
-		//Segundo Parametro (Mem)
+		//Segundo Parâmetro (Mem)
 		PC.read();
 		memory.read();
 		IR.store(); //Guarda o endereço do dado em IR
-		extbus1.put(113);
+		extbus1.put(333);
 		memory.store();
 		IR.read();
 		memory.store();
 
-		/*Restaura os valores dos RPGS com MovesImmReg
-		 * RPG0 = 82
-		 * RPG1 = 83
-		 * RPG2 = 84
-		 * RPG3 = 85
+		/*Restaura os valores dos RPGs com MoveImmReg
+		 * RPG0 = 302
+		 * RPG1 = 303
+		 * RPG2 = 304
+		 * RPG3 = 305
 		*/
 		//Move o primeiro RPG
-		extbus1.put(82);
+		extbus1.put(302);
 		memory.read();
 		IR.store();//Guarda o valor do RPG no IR
 		//UPCODE DO Move (14)
-		extbus1.put(114);
+		extbus1.put(334);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
-		//Primeiro Param
-		extbus1.put(115);
+		//Primeiro Parâmetro
+		extbus1.put(335);
 		memory.store();
 		IR.read();
 		memory.store();
-		//Segundo Param
-		extbus1.put(116);
+		//Segundo Parâmetro
+		extbus1.put(336);
 		memory.store();
 		extbus1.put(0);
 		memory.store();
 
 		//Move o Segundo RPG
-		extbus1.put(83);
+		extbus1.put(303);
 		memory.read();
 		IR.store();//Guarda o valor do RPG no IR
 		//UPCODE DO Move (14)
-		extbus1.put(117);
+		extbus1.put(337);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
-		//Primeiro Param
-		extbus1.put(118);
+		//Primeiro Parâmetro
+		extbus1.put(338);
 		memory.store();
 		IR.read();
 		memory.store();
-		//Segundo Param
-		extbus1.put(119);
+		//Segundo Parâmetro
+		extbus1.put(339);
 		memory.store();
 		extbus1.put(1);
 		memory.store();
 
 		//Move o Terceiro RPG
-		extbus1.put(84);
+		extbus1.put(304);
 		memory.read();
 		IR.store();//Guarda o valor do RPG no IR
 		//UPCODE DO Move (14)
-		extbus1.put(120);
+		extbus1.put(340);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
-		//Primeiro Param
-		extbus1.put(121);
+		//Primeiro Parâmetro
+		extbus1.put(341);
 		memory.store();
 		IR.read();
 		memory.store();
-		//Segundo Param
-		extbus1.put(122);
+		//Segundo Parâmetro
+		extbus1.put(342);
 		memory.store();
 		extbus1.put(2);
 		memory.store();
 
 		//Move o Quarto RPG
-		extbus1.put(85);
+		extbus1.put(305);
 		memory.read();
 		IR.store();//Guarda o valor do RPG no IR
 		//UPCODE DO Move (14)
-		extbus1.put(123);
+		extbus1.put(343);
 		memory.store();
 		extbus1.put(14);
 		memory.store();
-		//Primeiro Param
-		extbus1.put(124);
+		//Primeiro Parâmetro
+		extbus1.put(344);
 		memory.store();
 		IR.read();
 		memory.store();
-		//Segundo Param
-		extbus1.put(125);
+		//Segundo Parâmetro
+		extbus1.put(345);
 		memory.store();
 		extbus1.put(3);
 		memory.store();
@@ -1021,18 +1029,18 @@ public class Architecture {
 		 * JMP PROXIMA INSTRUCAO
 		 * Atualização de PC para a próxima instrução
 		 */
-		extbus1.put(126);
+		extbus1.put(346);
 		memory.store();
 		extbus1.put(16);
 		memory.store();
 
-		extbus1.put(127);
+		extbus1.put(347);
 		memory.store();
 		PC.read();
 		memory.store();
 		
 		/**
-		 * Faz PC = 86, nessa etapa, estamos desviando PC para 
+		 * Faz PC = 306, nessa etapa, estamos desviando PC para 
 		 * que o fetch seja realizado na parte reservada na memória para
 		 * o IMUL (processo que fizemos acima), em vez de permitir 
 		 * que PC siga para a próxima instrução do executavel.
@@ -1040,12 +1048,397 @@ public class Architecture {
 		 * No fim da operação, fazemos um outro desvio que leva PC ao 
 		 * fluxo normal do executavel novamente para que o programa siga
 		 */
-		extbus1.put(86);
+		extbus1.put(306);
 		PC.store();		
 	}
 
 	public void imulRegReg(){
+		/*
+		 * PC++ para conseguir o primeiro param
+		*/
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		//Guardamos PC na memoria
+		extbus1.put(301);
+		memory.store();
+		PC.read();
+		memory.store();
+
+		//Guardamos os RPGs
+		RPG0.read();
+		IR.internalStore();
+		extbus1.put(302);
+		memory.store();
+		IR.read();
+		memory.store();
 		
+		RPG1.read();
+		IR.internalStore();
+		extbus1.put(303);
+		memory.store();
+		IR.read();
+		memory.store();
+
+		RPG2.read();
+		IR.internalStore();
+		extbus1.put(304);
+		memory.store();
+		IR.read();
+		memory.store();
+
+		RPG3.read();
+		IR.internalStore();
+		extbus1.put(305);
+		memory.store();
+		IR.read();
+		memory.store();
+
+		/**
+		 * Move RegA Reg0 (upcode: 13)
+		 */
+		//Armazena o upcode do Move
+		extbus1.put(306);
+		memory.store();
+		extbus1.put(13);
+		memory.store();
+		//Recuperamos o ID do RegA (o primeiro parametro)
+		PC.read();
+		memory.read();
+		IR.store();		
+		//Guardamos na memoria o ID do RegA
+		extbus1.put(307);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Pôe o Reg0 na memoria
+		extbus1.put(308);
+		memory.store();
+		extbus1.put(0);
+		memory.store();
+
+		/**
+		 * Move imm Reg1 (setar Reg1 como 0)
+		 * REG
+			*/
+		//Colocamos o upcode de MoveImmReg na memoria
+		extbus1.put(309);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Colocamos 0 na proxima posição
+		extbus1.put(310);
+		memory.store();
+		extbus1.put(0);
+		memory.store();
+		//Colocamos o ID do Reg1 na proxima posição
+		extbus1.put(311);
+		memory.store();
+		extbus1.put(1);
+		memory.store();
+
+		/**
+		 * PC++ Para guardar o valor do segundo parametro
+		 */
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //Nesse momento, PC aponta para Mem (do imul)
+		
+		/**
+		 * Move RegB Reg3 (opcode: 13) 
+		 */
+		//armazena o upcode do Move
+		extbus1.put(312);
+		memory.store();
+		extbus1.put(13);
+		memory.store();
+		//Recuperamos o ID do RegB (o segundo parametro)
+		PC.read();
+		memory.read();
+		IR.store();		
+		//Guardamos na memoria o ID do RegB
+		extbus1.put(313);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Poe o Reg3 na memoria
+		extbus1.put(314);
+		memory.store();
+		extbus1.put(3);
+		memory.store();
+
+		/**
+		 * Realizamos o ADD Reg0 Reg1 (Onde o loop começa)
+		 */
+		//Colocamos o upcode de AddRegReg(0) na memoria
+		extbus1.put(315);
+		memory.store();
+		extbus1.put(0);
+		memory.store();
+		//Colocamos o primeiro parametro na memoria
+		extbus1.put(316);
+		memory.store();
+		extbus1.put(0);
+		memory.store();
+		//Colocamos o segundo paramentro na memoria
+		extbus1.put(317);
+		memory.store();
+		extbus1.put(1);
+		memory.store();
+		
+		/**
+		 * Move Imm Reg2 (Movemos 1 para o Reg2)
+		 */
+		//Upcode do moveImmReg
+		extbus1.put(318);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Primeiro parâmetro
+		extbus1.put(319);
+		memory.store();
+		extbus1.put(1);
+		memory.store();
+		//Segundo parâmetro
+		extbus1.put(320);
+		memory.store();
+		extbus1.put(2);
+		memory.store();
+
+		/**
+		 * SUB Reg3 Reg2
+		 */
+		//Upcode do sub na mem
+		extbus1.put(321);
+		memory.store();
+		extbus1.put(4);
+		memory.store();
+		//Guarda o ID do reg3
+		extbus1.put(322);
+		memory.store();
+		extbus1.put(3);
+		memory.store();
+		//Guarda o ID do reg2
+		extbus1.put(323);
+		memory.store();
+		extbus1.put(2);
+		memory.store();
+
+		/**
+		 * Fazemos um Move Reg2Reg3 para guardar o resultado da subtração no local correto 
+		 */
+		//Upcode do moveRegReg (13)
+		extbus1.put(324);
+		memory.store();
+		extbus1.put(13);
+		memory.store();
+		//Primeiro parâmetro
+		extbus1.put(325);
+		memory.store();
+		extbus1.put(2);
+		memory.store();
+		//Segundo parâmetro
+		extbus1.put(326);
+		memory.store();
+		extbus1.put(3);
+		memory.store();
+
+		/**
+		 * JZ MoveRegMem
+		 */
+		//Upcode jz (18) na mem
+		extbus1.put(327);
+		memory.store();
+		extbus1.put(18);
+		memory.store();
+		//Apontar para o endereço do Upcode moveRegMem
+		extbus1.put(328);
+		memory.store();
+		extbus1.put(331); 
+		memory.store();
+
+		/**
+		 * JMP ADD (retorna pro laço, caso o segundo param > 0)
+		 */
+		//Guarda o Upcode do jmp (16)
+		extbus1.put(329);
+		memory.store();
+		extbus1.put(16);
+		memory.store();
+		//Guarda o endereço do add na memória (inicio do laco)
+		extbus1.put(330);
+		memory.store();
+		extbus1.put(315);
+		memory.store();
+		
+		/**
+		 * MoveRegMem (Após a multiplicação, guarda o resultado na memória, pois o dado seria perdido no momento de recuperação dos valores dos RPGs)
+		 */
+		//Upcode do moveRegMem (12)
+		extbus1.put(331);
+		memory.store();
+		extbus1.put(12);
+		memory.store();
+		//Primeiro Parâmetro (Reg 1)
+		extbus1.put(332);
+		memory.store();
+		extbus1.put(1);
+		memory.store();
+		//Segundo Parametro (Mem)
+		PC.read();
+		//memory.read();
+		IR.store(); //Guarda o endereço do dado em IR
+		extbus1.put(333);
+		memory.store();
+		IR.read();
+		memory.store();
+
+		/*Restaura os valores dos RPGs com MoveImmReg
+		 * RPG0 = 302
+		 * RPG1 = 303
+		 * RPG2 = 304
+		 * RPG3 = 305
+		**/
+		//Move o primeiro RPG0
+		extbus1.put(302);
+		memory.read();
+		IR.store();//Guarda o valor do RPG no IR
+		//UPCODE DO Move (14)
+		extbus1.put(334);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Primeiro Parâmetro
+		extbus1.put(335);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Segundo Parâmetro
+		extbus1.put(336);
+		memory.store();
+		extbus1.put(0);
+		memory.store();
+
+		//Move o Segundo RPG1
+		extbus1.put(303);
+		memory.read();
+		IR.store();//Guarda o valor do RPG no IR
+		//UPCODE DO Move (14)
+		extbus1.put(337);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Primeiro Parâmetro
+		extbus1.put(338);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Segundo Parâmetro
+		extbus1.put(339);
+		memory.store();
+		extbus1.put(1);
+		memory.store();
+
+		//Move o Terceiro RPG2
+		extbus1.put(304);
+		memory.read();
+		IR.store();//Guarda o valor do RPG no IR
+		//UPCODE DO Move (14)
+		extbus1.put(340);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Primeiro Parâmetro
+		extbus1.put(341);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Segundo Parâmetro
+		extbus1.put(342);
+		memory.store();
+		extbus1.put(2);
+		memory.store();
+
+		//Move o Quarto RPG3
+		extbus1.put(305);
+		memory.read();
+		IR.store();//Guarda o valor do RPG no IR
+		//UPCODE DO Move (14)
+		extbus1.put(343);
+		memory.store();
+		extbus1.put(14);
+		memory.store();
+		//Primeiro Parâmetro
+		extbus1.put(344);
+		memory.store();
+		IR.read();
+		memory.store();
+		//Segundo Parâmetro
+		extbus1.put(345);
+		memory.store();
+		extbus1.put(3);
+		memory.store();
+
+		/*
+		 * MoveMemReg (preciso recuperar o resultado da memória para o registrador)
+		**/
+		//Opcode do moveMemReg (11)
+		extbus1.put(346);
+		memory.store();
+		extbus1.put(11);
+		memory.store();
+
+		//Primeiro parâmetro (Mem)
+		extbus1.put(347);
+		memory.store();
+		extbus1.put(333);
+		memory.read();
+		memory.store();
+
+		//Segundo parâmetro (RegB)
+		extbus1.put(348);
+		memory.store();
+		extbus1.put(313);
+		memory.read();
+		memory.store();
+		
+		//PC++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+
+		/**
+		 * JMP PROXIMA INSTRUCAO
+		 * Atualização de PC para a próxima instrução
+		 */
+		extbus1.put(349);
+		memory.store();
+		extbus1.put(16);
+		memory.store();
+
+		extbus1.put(350);
+		memory.store();
+		PC.read();
+		memory.store();
+		
+		/**
+		 * Faz PC = 306, nessa etapa, estamos desviando PC para 
+		 * que o fetch seja realizado na parte reservada na memória para
+		 * o IMUL (processo que fizemos acima), em vez de permitir 
+		 * que PC siga para a próxima instrução do executavel.
+		 * 
+		 * No fim da operação, fazemos um outro desvio que leva PC ao 
+		 * fluxo normal do executavel novamente para que o programa siga
+		 */
+		extbus1.put(306);
+		PC.store();		
 	}
 
 	public void moveMemReg() {
@@ -1961,7 +2354,7 @@ public class Architecture {
 		String instruction;
 		int parameter = 0;
 		System.out.println("Memory state:");
-		for (int i = 127; i >= this.stkTop.getData(); i--) {
+		for (int i = 400; i >= this.stkTop.getData(); i--) {
 			System.out.println("memory["+i+"]="+memory.getDataList()[i]);
 		}
 		for (Register r:registersList) {
@@ -2052,7 +2445,7 @@ public class Architecture {
 	
 	public static void main(String[] args) throws IOException {
 		Architecture arch = new Architecture(true);
-		arch.readExec("imul");
+		arch.readExec("imulRegReg");
 		arch.controlUnitEexec();
 	}
 	

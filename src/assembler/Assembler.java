@@ -449,7 +449,7 @@ public class Assembler {
 	 * and decreases (creating a stack)
 	 */
 	protected void replaceAllVariables() {
-		int position = arch.getMemorySize()-48; //starting from the end of the memory
+		int position = arch.getMemorySize()-100; //starting from the end of the memory
 		for (String var : this.variables) { //scanning all variables
 			replaceVariable(var, position);
 			position --;
