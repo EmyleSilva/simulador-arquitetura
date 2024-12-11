@@ -212,7 +212,7 @@ public class Architecture {
 		commandsList.add("moveRegReg");  //13
 		commandsList.add("moveImmReg");  //14
 		//commandsList.add("inc");  	       
-		commandsList.add("inc");	   	   //15
+		commandsList.add("incReg");	   	   //15
 		commandsList.add("jmp");         //16
 		commandsList.add("jn");          //17
 		commandsList.add("jz");          //18
@@ -1523,7 +1523,7 @@ public class Architecture {
 		memory.read();
 		IR.store();
 		
-		//JUMP 1
+		//Pega o último parâmetro e adiciona na posição 1 status Memory (JMP 1)
 		ula.inc();
 		ula.internalRead(1);
 		PC.internalStore();
@@ -1544,7 +1544,7 @@ public class Architecture {
 		ula.sub();
 		ula.internalRead(1);
 		setStatusFlags(intbus2.get());
-		extbus1.put(Flags.getBit(1));
+		extbus1.put(Flags.getBit(0));
 		statusMemory.read();
 		PC.store();
 	}

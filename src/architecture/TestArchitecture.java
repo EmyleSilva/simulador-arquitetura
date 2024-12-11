@@ -1390,7 +1390,7 @@ public class TestArchitecture {
 		//now setting the registers values
 		arch.getIntbus1().put(45);
 		arch.getRegistersList().get(0).internalStore(); //RPG0 has 45
-		arch.getIntbus1().put(7);
+		arch.getIntbus1().put(45);
 		arch.getRegistersList().get(1).internalStore(); //RPG1 has 99
 
 		arch.jgt();
@@ -1398,7 +1398,7 @@ public class TestArchitecture {
 		arch.getRegistersList().get(0).internalRead();
 		assertEquals(45, arch.getIntbus1().get());
 		arch.getRegistersList().get(1).internalRead();
-		assertEquals(7, arch.getIntbus1().get());
+		assertEquals(45, arch.getIntbus1().get());
 
 		arch.getPC().read();
 		assertEquals(30, arch.getExtbus1().get());
