@@ -259,7 +259,7 @@ public class TestArchitecture {
 		arch.getMemory().getDataList()[2] = 5; //Valor armazenado na mem
 		arch.getMemory().getDataList()[29] = 2; //ID do Reg2 
 		arch.getMemory().getDataList()[30] = 2; //Valor armazenado na mem
-				arch.getMemory().getDataList()[31] = -1; //Valor armazenado na mem
+		arch.getMemory().getDataList()[31] = -1; //Valor armazenado na mem
 		//PC aponta para 28
 		arch.getExtbus1().put(28);
 		arch.getPC().store();
@@ -279,7 +279,7 @@ public class TestArchitecture {
 
 		//No fim, PC deve ser igual a 31
 		arch.getPC().read();
-		assertEquals(31, arch.getExtbus1().get());*/
+		assertEquals(31, arch.getExtbus1().get());
 
 		//Na memoria, a posicao 29 deve ser igual a 2 
 		// e a posição 30 deve ser 10
