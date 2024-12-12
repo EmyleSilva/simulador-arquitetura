@@ -1,0 +1,46 @@
+a
+b
+c
+ldi 10                
+move %RPG0 a          
+move 1 %RPG1          
+add %RPG0 %RPG1      
+ldi 15
+move %RPG0 %RPG3      
+sub %RPG3 a           
+laco:
+move 1 %RPG0          
+move 2 %RPG2          
+imul %RPG0 %RPG2      
+sub %RPG2 %RPG3       
+jn laco               
+laco2:
+move a %RPG0          
+add a %RPG1           
+add %RPG1 a           
+add 15 %RPG3           
+jneq %RPG1 %RPG3 laco2 
+jmp laco3
+ldi -5
+laco3:
+move 4 %RPG2
+jz laco3
+incReg %RPG0
+ldi 20
+sub 30 %RPG0
+move 5 %RPG1
+move %RPG1 b
+sub b %RPG0 
+imul b %RPG2
+move 3 %RPG3 
+move %RPG3 c
+imul %RPG3 c
+laco4:
+move 3 %RPG0 
+jeq %RPG0 %RPG3 laco4
+laco5:
+move %RPG3 %RPG0
+jgt %RPG1 %RPG0 laco5
+laco6:
+move 3 %RPG2
+jlw %RPG2 %RPG1 laco6

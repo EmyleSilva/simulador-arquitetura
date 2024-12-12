@@ -1,0 +1,14 @@
+breno
+emyle
+jesus
+ldi 6
+move %RPG0 breno
+ldi 10 
+move %RPG0 emyle
+ldi 100
+move %RPG0 jesus
+add %RPG0 breno
+move breno %RPG1
+add %RPG0 emyle
+move emyle %RPG2
+

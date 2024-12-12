@@ -1,0 +1,7 @@
+var1 
+var2
+ldi 4
+move %RPG0 %RPG1
+ldi 2
+move %RPG0 var1
+imul %RPG1 var1

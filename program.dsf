@@ -3,7 +3,7 @@ b
 c
 t
 ldi 1
-move %RPG0 %RPG1
+imul %RPG0 %RPG1
 store a
 ldi 3
 store b
@@ -13,10 +13,10 @@ read b
 store t
 laco:
 read b
-add t
+add t t
 store b
 read a
-inc
+incReg %RPG0
 store a
-sub c
+subMemReg c %RPG0
 jn laco
