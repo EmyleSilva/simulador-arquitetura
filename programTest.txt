@@ -1,24 +1,24 @@
 //addRegReg   //0 (IDADE)
 //addMemReg   //1 (IDADE)
 /addRegMem   //2 (IDADE)
-addImmReg   //3            
+//addImmReg   //3 (Operaçâo)            
 //subRegReg   //4 (IDADE)
-subMemReg   //5
-subRegMem   //6
-subImmReg   //7
-imulMemReg  //8
-imulRegMem  //9
-imulRegReg  //10
+//subMemReg   //5 (Operaçâo)
+//subRegMem   //6 (Operaçâo)
+//subImmReg   //7 (Operaçâo)
+//imulMemReg  //8
+//imulRegMem  //9
+//imulRegReg  //10 (Operaçâo)
 /moveMemReg  //11(IDADE)
 /moveRegMem  //12(IDADE)
 /moveRegReg  //13(IDADE)
 /moveImmReg  //14  (IDADE)
 /inc	   	//15(IDADE)
 /jmp        //16(IDADE)
-jn         //17
-jz         //18
-jeq        //19
-jneq       //20
+//jn         //17 (Operaçâo)
+//jz         //18 (Operaçâo)
+//jeq        //19 
+//jneq       //20 (Operaçâo)
 /jgt        //21(IDADE)
 /jlw        //22(IDADE)
 /read       //23(IDADE)
@@ -84,3 +84,112 @@ store      //24
     idade = 26
     flagsNegative = 1
     */
+    
+{Programa 2: Operaçâo}
+RPGO = 10
+RPG1 = 0
+RPG2 = -20 //mudar
+RPG3 = 0
+multiplica 0
+subtracao 15
+guarda 
+laco:
+[1]:
+    subtracao = RPG0 - subtracao (-5) - subRegMem 
+    RPG2 = -30 + RPG2 (-50) - imulRegReg //mudar
+    multiplica = RPG2
+    RPG2 = 55 + RPG2 (5) - addImmReg
+    RPG1 = 105
+    jneq RPG2 RPG1 laco
+[2]:
+    subtracao = (10) - (-5) //15
+    RPG2 = -30 + 5 //-25
+    multiplica = 50
+    RPG2 = 55 + 50 (105)
+    RPG1 = -25
+    jneq RPG2 RPG1 laco (falso)
+
+RPG1 = multiplica - RPG1 (-55) - subMemReg
+RPG3 = 20 - RPG3 (20) - subImmReg
+
+laco2:
+    RPG3 = RPG1 + RPG3 (-35) addRegReg
+    jn laco3
+
+laco3:
+    RPG2 = 35 + RPG2 (0) addImmReg
+    jz laco4
+
+laco4:
+    RPG2 = 30
+    RPG2 = subtracao(15) * RPG2 (30) //450
+    RPG1 = 30
+    guarda = 15
+    guarda = RPG1 * guarda //450
+    RPG1 = subtracao
+    RPG2 = guarda
+    jeq RPG2 RPG1
+
+laco5:
+    ldi 50
+incReg RPG0
+
+RPGS:
+0: 51
+1: 450
+2: 450
+3: -35
+
+multiplica = 50
+subtracao = 450 
+    
+    
+{Programa 3}
+var1
+var2
+var3 
+ldi 1
+move %RPG0 var3 (1)
+ldi 10
+move %RPG0 var1 (10)
+move 20 %RPG1 (20)
+move %RPG1 var2 (20)
+move 30 %RPG2 (30)
+move 40 %RPG3 (40)
+add 10 %RPG0 (20)
+sub var1 %RPG0 (-10)
+sub %RPG3 var2 (20)
+sub 10 %RPG0 (20)
+jn laco(segue)
+laco:
+imul %RPG1 %RPG2 (600) (1000)
+imul %RPG2 var3 (600) (1M)
+move var3 %RPG3 (600) (1M)
+jeq %RPG2 %RPG3 laco1 [1: V]
+jmp laco3 [2: V]
+laco1:
+move 50 %RPG2 (50)
+move 60 %RPG3 (60)
+jmp laco
+laco3:
+sub 1000 %RPG2 (0)
+jz laco4
+ldi -80
+laco4:
+ldi 80
+
+
+RPGS:
+0: 80
+1: 20
+2: 1k
+3: 1M
+
+var1: 10
+var2: 20
+var3: 1M
+
+    
+    
+    
+  

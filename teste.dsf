@@ -1,0 +1,32 @@
+var1
+var2
+var3 
+ldi 1
+move %RPG0 var3 
+ldi 10
+move %RPG0 var1 
+move 20 %RPG1 
+move %RPG1 var2 
+move 30 %RPG2 
+move 40 %RPG3 
+add 10 %RPG0 
+sub var1 %RPG0
+sub %RPG3 var2
+sub 10 %RPG0 
+jn laco
+laco:
+imul %RPG1 %RPG2 
+imul %RPG2 var3 
+move var3 %RPG3
+jeq %RPG2 %RPG3
+jmp laco3 
+laco1:
+move 50 %RPG2 
+move 60 %RPG3 
+jmp laco
+laco3:
+sub 1000 %RPG2 
+jz laco4
+ldi -80
+laco4:
+ldi 80
