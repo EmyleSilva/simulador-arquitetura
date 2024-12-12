@@ -586,6 +586,7 @@ public class Architecture {
 	    ula.internalStore(0);
 	    ula.sub();
 	    ula.read(1);
+	    setStatusFlags(intbus1.get());
 		 // Resultado é colocado no intbus2
 	    registersInternalStore(); // Armazena o resultado em regA
 
